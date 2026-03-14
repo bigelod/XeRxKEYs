@@ -1,0 +1,101 @@
+# App contains a user-generated library with import/export of:
+-> Gesture Profiles
+-> Motion Gestures
+-> Actions (aka: macros)
+
+# App also contains a built-in list of Trigger_Condition_Type
+
+Main_App::
+-> Selected_Module (XRModule, default WXR) //Can be set via launch argument: -module "NAME"
+-> Profile_On_Start (String, default "") //Gesture profile, set via launch argument: -profile "NAME"
+-> Launch_On_Start (String, default "") //Used to launch another app, set via launch argument: -launch "PATH_TO_EXE"
+-> Minimize_On_Start (Bool, default True) //Will appear if profile is blank
+
+Tracked_Object::
+-> Name (String, 50 characters)
+-> X (Float)
+-> Y (Float)
+-> Z (Float)
+-> Rotation (Quaternion)
+
+Quaternion::
+-> X (Float)
+-> Y (Float)
+-> Z (Float)
+-> W (Float)
+
+=============================
+Module formats:
+=============================
+XRModule::
+-> Name (String, 50 characters) //The module name
+-> Head (Tracked_Object) //The Head object provided by this module
+-> L_Hand (Tracked_Object) //The L_Hand object provided by this module
+-> R_Hand (Tracked_Object) //The R_Hand object provided by this module
+
+=============================
+Gesture recording formats:
+=============================
+Gesture_Profile::
+-> Name (String, 50 characters) //Name of the selected profile
+-> Motion_Gestures (Motion_Gesture Array) // The gestures attached to this profile
+
+Motion_Gesture::
+-> Name (String, 50 characters) //The name of the motion gesture
+-> Image (PNG) //An optional image to show in the motion gesture library
+-> Description (String, 300 characters) //Brief description of the gesture
+-> Sensitivity (Float, default 1) //Sensitivty of the motion gesture
+-> Cooldown (Float, default 0) //Cooldown time after triggered, default 0
+-> Trigger_Conditions (Trigger_Condition Array) //Conditions to form this trigger
+-> Trigger_Actions (Action Array) //Actions to perform when triggered
+
+Trigger_Condition::
+-> Type (Trigger_Condition_Type) //Trigger type, defined below
+-> Require_Trigger_Conditions (Trigger_Condition Array) //Disable the trigger if any of these conditions are False
+-> Disable_If_Trigger_Conditions (Trigger_Condition Array) //Disable the trigger if any of these conditions are True
+
+Trigger_Condition_Type::
+-> Image (PNG) //To show in the trigger type selection list
+-> Shake_Vertical (Shake_Event) //Shake the device vertically to trigger, Y axis relative to "forward" of HMD
+-> Shake_Horizontal (Shake_Event) //Shake the device horizontally to trigger, X axis relative to "forward" of HMD
+-> Stab (Shake_Event) //Stab the device forward like a knife to trigger, Z axis relative to "forward" of HMD
+-> Twist (Shake_Event) //Twist the device like a doorhandle relative to "forward" of HMD
+-> Slash (Shake_Event) //Slash the device forward like a sword
+-> Swipe (Shake_Event) //Swipe the device like a horizontal card reader
+-> Proximity (Proximity_Event) //Trigger when two or more devices are in proximity to each other
+
+#Future trigger type ideas:
+-> Trigger if controller within certain physical space? (eg: trigger boxes), might require visualization/3D editor
+-> Trigger if controller input + gesture (for multi-mapping a button to different gestures?)
+
+Change_Amount::
+-> Min_Value (Float, default 0) //Min value to count as a shake, default 0
+-> Max_Value (Float, default -1) //Max value to count as shake, default -1 for infinite
+-> Duration (Float, default 0.33) //Min time to shake for to trigger
+-> Sensitivity_Scale (Float, default 1) //How much sensitivity settings affect this
+
+Shake_Event::
+-> Trigger_For_Objects (Tracked_Object Array) //Which object(s) can trigger this condition?
+-> Trigger_When (Change_Amount) //Trigger when shaken by this amount
+
+Proximity_Event::
+-> Device_A (Tracked_Object Array) //Any devices that can count as A
+-> Device_B (Tracked_Object Array) //Any devices that can count as B
+-> Trigger_When (Change_Amount) //Trigger when any Device A is within range of Device B by Change_Amount
+-> Invert (Bool, default False) //Trigger when this is NOT within range instead
+
+=============================
+Key recording formats:
+=============================
+Action::
+-> Name (String, 50 characters) //The name of this action
+-> Description (String, 300 characters) //The description of this action
+-> Key_Combos (Key_Combo Array) //The array of key_combos
+-> Wait_Time (Float) //How long to wait between key_combo sends
+
+Key_Combo::
+-> Keys (Key Array) //The keys to press in the combo
+
+Key::
+-> KeyCode (Char) //Key code to trigger
+-> Hold_Time (Float) //How long to hold the key for, regardless of whether the action has moved onto next key)
