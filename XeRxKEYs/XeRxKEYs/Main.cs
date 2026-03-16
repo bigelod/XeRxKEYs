@@ -13,23 +13,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinApi;
-using XeRxKEYs.Properties;
+using XeRxKEYs.Gestures.MotionGestures;
+using XeRxKEYs.Gestures.GestureProfiles;
+using XeRxKEYs.Gestures.Triggers.Actions;
 
 namespace XeRxKEYs
 {
     public partial class Main : Form
     {
+        private const int inputSendTime = 5000;
         private System.Threading.Timer _keySenderTimer;
 
         private InputHelper inputHelper;
 
         private bool sendLock = false;
 
+        public GestureProfile ActiveGestureProfile = null;
         public List<SendableInput> ActiveSendables = new List<SendableInput>();
 
         private IXRModule xrModuleInstance = null;
         private Type xrModuleType = typeof(IXRModule);
 
+        private List<IOutModule> activeOutModules = new List<IOutModule>();
+        private List<Type> activeOutModuleTypes = new List<Type>();
+
+        private List<TriggerAction> allTriggerActions = new List<TriggerAction>();
+        private List<MotionGesture> allMotionGestures = new List<MotionGesture>();
+        private List<GestureProfile> allGestureProfiles = new List<GestureProfile>();
+        
         public Main()
         {
             InitializeComponent();
@@ -39,11 +50,12 @@ namespace XeRxKEYs
         {
             this.ShowInTaskbar = false;
 
+            Resize += Main_Resize;
             FormClosing += Main_FormClosing;
             niTaskbarIcon.MouseUp += niTaskbarIcon_MouseUp;
 
             //TODO: Update this to send more frequently
-            _keySenderTimer = new System.Threading.Timer(TimerCallback, null, 5000, 5000);
+            _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
 
             inputHelper = new InputHelper();
 
@@ -54,7 +66,7 @@ namespace XeRxKEYs
                 MessageBox.Show(this, "Input module not found! Setting back to default", "XeRxKEYs - Error loading Input module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 settings.XRModule = "WinXRApi";
                 settings.Save();
-                
+
                 if (!SetupInputModule("WinXRApi"))
                 {
                     MessageBox.Show(this, "Catastrophic error! Closing!", "XeRxKEYs - Error loading Input module!", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -62,10 +74,96 @@ namespace XeRxKEYs
                 }
             }
 
-            if (settings.MinimizeAtStart && settings.GestureProfile != "")
+            SetupOutputModules(Properties.Settings.Default.OutModules);
+
+            LoadTriggerActions();
+
+            LoadMotionGestures();
+
+            LoadGestureProfiles();
+
+            //Create and save a Test Profile
+            TriggerAction c = new TriggerAction();
+            MotionGesture b = new MotionGesture("MotionTest");
+            GestureProfile a = new GestureProfile("GestureTest");
+
+            c.Name = "TriggerTest";
+            allTriggerActions.Add(c);
+
+            b.TriggerActions.Add(c);
+            allMotionGestures.Add(b);
+
+            a.Gestures.Add(b);
+            allGestureProfiles.Add(a);
+
+            SaveTriggerActions();
+
+            SaveMotionGestures();
+
+            SaveGestureProfiles();
+
+            if (settings.GestureProfile != "")
             {
-                this.WindowState = FormWindowState.Minimized;
+                //Try to enable the active Gesture Profile
+
+                if (settings.MinimizeAtStart)
+                {
+                    this.WindowState = FormWindowState.Minimized;
+                }
             }
+        }
+
+        private void SetupOutputModules(string modules)
+        {
+            string[] moduleNames = modules.Split(',');
+
+            foreach (string module in moduleNames)
+            {
+                if (!string.IsNullOrEmpty(module))
+                {
+                    if (!SetupOutputModule(module))
+                    {
+                        MessageBox.Show(this, "Output Module '" + module + "' failed to load, continuing without it.", "XeRxKEYs - Error loading Output module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+        }
+
+        private bool SetupOutputModule(string moduleName)
+        {
+            IOutModule outModuleInstance = null;
+            Type outModuleType = typeof(IOutModule);
+
+            bool result = GetOutputModule(moduleName, ref outModuleType);
+
+            if (result)
+            {
+                outModuleInstance = (IOutModule)Activator.CreateInstance(outModuleType);
+                outModuleInstance.Setup();
+
+                activeOutModules.Add(outModuleInstance);
+                activeOutModuleTypes.Add(outModuleType);
+            }
+
+            return result;
+        }
+
+        private bool GetOutputModule(string moduleName, ref Type outModuleType)
+        {
+            bool found = false;
+
+            foreach (Type moduleType in Assembly.GetExecutingAssembly().GetTypes()
+                 .Where(moduleType => moduleType.GetInterfaces().Contains(typeof(IOutModule))))
+            {
+                if (moduleType.Name == moduleName)
+                {
+                    outModuleType = moduleType;
+                    found = true;
+                    break;
+                }
+            }
+
+            return found;
         }
 
         private bool SetupInputModule(string moduleName)
@@ -98,6 +196,63 @@ namespace XeRxKEYs
 
             return found;
         }
+        private void SendKeysToForegroundWindow(IntPtr myOwnHandle)
+        {
+            IntPtr targetHwnd = WindowsAPI.GetForegroundWindow();
+            if (sendLock || targetHwnd == myOwnHandle || targetHwnd == IntPtr.Zero) // || ActiveSendables.Count <= 0)
+            {
+                return;
+            }
+
+            sendLock = true;
+
+            foreach (IOutModule module in activeOutModules)
+            {
+                module.SendInput(ActiveSendables);
+            }
+
+            //ActiveSendables.Clear();
+
+            sendLock = false;
+        }
+
+        private void LoadTriggerActions()
+        {
+            ActionLoadSave.LoadProfiles(ref allTriggerActions);
+        }
+
+        private void LoadMotionGestures()
+        {
+            MotionLoadSave.LoadProfiles(ref allMotionGestures);
+        }
+
+        private void LoadGestureProfiles()
+        {
+            GestureLoadSave.LoadProfiles(ref allGestureProfiles);
+        }
+        
+        private void SaveTriggerActions()
+        {
+            ActionLoadSave.SaveProfiles(allTriggerActions);
+        }
+
+        private void SaveMotionGestures()
+        {
+            MotionLoadSave.SaveProfiles(allMotionGestures);
+        }
+
+        private void SaveGestureProfiles()
+        {
+            GestureLoadSave.SaveProfiles(allGestureProfiles);
+        }
+
+        private void Main_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+            }
+        }
 
         private void niTaskbarIcon_MouseUp(object sender, MouseEventArgs e)
         {
@@ -110,6 +265,11 @@ namespace XeRxKEYs
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
+            foreach (IOutModule module in activeOutModules)
+            {
+                module.Shutdown();
+            }
+
             if (xrModuleInstance != null)
             {
                 xrModuleInstance.Shutdown();
@@ -125,77 +285,17 @@ namespace XeRxKEYs
             {
                 myOwnHandle = this.Handle;
             });
-            SendKeysToForegroundWindow(myOwnHandle);
-        }
 
-        private void SendKeysToForegroundWindow(IntPtr myOwnHandle)
-        {
-            IntPtr targetHwnd = WindowsAPI.GetForegroundWindow();
-            if (sendLock || targetHwnd == myOwnHandle || targetHwnd == IntPtr.Zero ) // || ActiveSendables.Count <= 0)
+            if (chkSendInputs.Checked)
             {
-                return;
+                SendKeysToForegroundWindow(myOwnHandle);
             }
-
-            sendLock = true;
-
-            WindowsAPI.SetForegroundWindow(targetHwnd);
-
-            Thread.Sleep(50);
-
-            //foreach (SendableInput input in ActiveSendables)
-            //{
-
-            //}
-
-            //ActiveSendables.Clear();
-            
-            //TODO: Remove DEBUG code below
-
-            if (chkSendInput.Checked)
-            {
-                inputHelper.PressKey('w', true);
-                Thread.Sleep(100);
-                inputHelper.PressKey('w', false);
-                Thread.Sleep(100);
-                inputHelper.PressKey('a', true);
-                Thread.Sleep(100);
-                inputHelper.PressKey('a', false);
-
-                int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-                int screenHeight = Screen.PrimaryScreen.Bounds.Height;
-                int targetX = screenWidth / 2;
-                int targetY = screenHeight / 2;
-
-                inputHelper.MoveMouse(targetX, targetY);
-
-                Thread.Sleep(100);
-
-                inputHelper.SendMouseClick(WindowsAPI.MOUSEEVENTF_RIGHTDOWN, WindowsAPI.MOUSEEVENTF_RIGHTUP, 100);
-
-                Thread.Sleep(100);
-
-                inputHelper.ScrollMouseWheel(-120);
-            }
-
-            if (chkFallback.Checked)
-            {
-                inputHelper.PressKeyFallback(new SendableKey("W", "W"));
-                inputHelper.PressKeyFallback(new SendableKey("w", "w"));
-                inputHelper.PressKeyFallback(new SendableKey("A", "A"));
-                inputHelper.PressKeyFallback(new SendableKey("a", "a"));
-
-                inputHelper.ScrollMouseWheelFallback(120);
-                Thread.Sleep(1500);
-                inputHelper.ScrollMouseWheelFallback(-120);
-
-                inputHelper.SendMouseClickFallback(WindowsAPI.MOUSEEVENTF_MIDDLEDOWN, WindowsAPI.MOUSEEVENTF_MIDDLEUP);
-            }
-
-            sendLock = false;
         }
 
         private void ShowWindow()
         {
+            Show();
+
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.WindowState = FormWindowState.Normal;
@@ -220,7 +320,7 @@ namespace XeRxKEYs
             Close();
         }
 
-        private void chkFallback_CheckedChanged(object sender, EventArgs e)
+        private void chkSendInputs_CheckedChanged(object sender, EventArgs e)
         {
 
         }

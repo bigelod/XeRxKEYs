@@ -11,5 +11,8 @@
     <Setting Name="GestureProfile" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="OutModules" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SendKeysModule,WinXROut,SendInputModule</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

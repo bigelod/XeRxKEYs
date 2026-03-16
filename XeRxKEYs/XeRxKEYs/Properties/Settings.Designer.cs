@@ -58,5 +58,17 @@ namespace XeRxKEYs.Properties {
                 this["GestureProfile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SendKeysModule,WinXROut,SendInputModule")]
+        public string OutModules {
+            get {
+                return ((string)(this["OutModules"]));
+            }
+            set {
+                this["OutModules"] = value;
+            }
+        }
     }
 }

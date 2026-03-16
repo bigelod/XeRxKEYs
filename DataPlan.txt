@@ -10,9 +10,10 @@ Main_App::
 -> Profile_On_Start (String, default "") //Gesture profile, set via launch argument: -profile "NAME"
 -> Launch_On_Start (String, default "") //Used to launch another app, set via launch argument: -launch "PATH_TO_EXE"
 -> Minimize_On_Start (Bool, default True) //Will appear if profile is blank
+-> Out_Module (OutModule, default WXR) //Can be set via launch argument: -outmod "NAME", CSV format
 
 Tracked_Object::
--> Name (String, 50 characters)
+-> Name (String, 50 characters?)
 -> X (Float)
 -> Y (Float)
 -> Z (Float)
@@ -28,22 +29,25 @@ Quaternion::
 Module formats:
 =============================
 XRModule::
--> Name (String, 50 characters) //The module name
+-> Name (String, 50 characters?) //The module name
 -> Head (Tracked_Object) //The Head object provided by this module
 -> L_Hand (Tracked_Object) //The L_Hand object provided by this module
 -> R_Hand (Tracked_Object) //The R_Hand object provided by this module
+
+OutputModule::
+-> Name //The name of the output module, used for sending data in various formats
 
 =============================
 Gesture recording formats:
 =============================
 Gesture_Profile::
--> Name (String, 50 characters) //Name of the selected profile
+-> Name (String, 50 characters?) //Name of the selected profile
 -> Motion_Gestures (Motion_Gesture Array) // The gestures attached to this profile
 
 Motion_Gesture::
--> Name (String, 50 characters) //The name of the motion gesture
+-> Name (String, 50 characters?) //The name of the motion gesture
 -> Image (PNG) //An optional image to show in the motion gesture library
--> Description (String, 300 characters) //Brief description of the gesture
+-> Description (String, 300 characters?) //Brief description of the gesture
 -> Sensitivity (Float, default 1) //Sensitivty of the motion gesture
 -> Cooldown (Float, default 0) //Cooldown time after triggered, default 0
 -> Trigger_Conditions (Trigger_Condition Array) //Conditions to form this trigger
@@ -88,8 +92,8 @@ Proximity_Event::
 Key recording formats:
 =============================
 Action::
--> Name (String, 50 characters) //The name of this action
--> Description (String, 300 characters) //The description of this action
+-> Name (String, 50 characters?) //The name of this action
+-> Description (String, 300 characters?) //The description of this action
 -> Key_Combos (Key_Combo Array) //The array of key_combos
 -> Wait_Time (Float) //How long to wait between key_combo sends
 

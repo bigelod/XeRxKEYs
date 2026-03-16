@@ -35,7 +35,7 @@ namespace XeRxKEYs.XRModules.WXR
             udpReadThread.Start();
         }
 
-        public void SendHapticVibration(float lControllerVibration, float rControllerVibration, string vrFlag = "2", string sbsFlag = "-1")
+        public void SendHapticVibration(float lControllerVibration, float rControllerVibration, string vrFlag = "2", string sbsFlag = "0")
         {
             //V0.2 now takes L Vibration, R Vibration, VR flag, SBS flag, target FOV W, target FOV H
             float lCV = Math.Max(0f, lControllerVibration);

@@ -66,6 +66,7 @@ namespace XeRxKEYs
         MouseClick,
         MouseScroll
     }
+
     public class SendableInput
     {
         public SendType Type;
@@ -146,6 +147,26 @@ namespace XeRxKEYs
             DisplayName = name;
             SendValue = sendVal;
             RawValue = val;
+        }
+    }
+
+    public class SendableInputCombo
+    {
+        public List<SendableInput> ComboInputs { get; set; }
+
+        public SendableInputCombo()
+        {
+            ComboInputs = new List<SendableInput>();
+        }
+    }
+
+    public class SerializableSendableCombo
+    {
+        public List<string> ComboInputs { get; set; }
+
+        public SerializableSendableCombo()
+        {
+            ComboInputs = new List<string>();
         }
     }
 }
