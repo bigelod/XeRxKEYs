@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,14 +21,16 @@ namespace XeRxKEYs.Gestures.MotionGestures
                 Directory.CreateDirectory(profilesFolderPath);
             }
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
+            JsonSerializerSettings options = new JsonSerializerSettings { Formatting = Formatting.Indented };
             foreach (MotionGesture profile in motionProfiles)
             {
+                profile.OnSave();
+
                 if (string.IsNullOrWhiteSpace(profile.Name)) continue;
 
                 string filePath = Path.Combine(profilesFolderPath, profile.Name + ".json");
 
-                string jsonString = JsonSerializer.Serialize(profile, options);
+                string jsonString = JsonConvert.SerializeObject(profile, options);
 
                 File.WriteAllText(filePath, jsonString);
             }
@@ -53,9 +55,10 @@ namespace XeRxKEYs.Gestures.MotionGestures
                 string jsonString = File.ReadAllText(filePath);
                 try
                 {
-                    MotionGesture profile = JsonSerializer.Deserialize<MotionGesture>(jsonString);
+                    MotionGesture profile = JsonConvert.DeserializeObject<MotionGesture>(jsonString);
                     if (profile != null)
                     {
+                        profile.OnLoad();
                         motionProfiles.Add(profile);
                     }
                 }

@@ -17,5 +17,21 @@ namespace XeRxKEYs.Gestures.GestureProfiles
             Name = _name;
             Gestures = new List<MotionGesture>();
         }
+
+        public void OnLoad()
+        {
+            foreach (MotionGesture gesture in Gestures)
+            {
+                gesture.OnLoad();
+            }
+        }
+
+        public void OnSave()
+        {
+            foreach (MotionGesture gesture in Gestures)
+            {
+                gesture.OnSave();
+            }
+        }
     }
 }

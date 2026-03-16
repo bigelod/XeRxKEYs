@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace XeRxKEYs.Gestures.Triggers
 {
@@ -21,9 +24,112 @@ namespace XeRxKEYs.Gestures.Triggers
     {
         public TriggerConditionType Type { get; set; }
 
-        public List<TriggerCondition> Require_Trigger_Conditions = new List<TriggerCondition>();
-        public List<TriggerCondition> Disable_If_Trigger_Conditions = new List<TriggerCondition>();
-    }
+        public List<TriggerCondition> Require_Trigger_Conditions { get; set; }
+        public List<TriggerCondition> Disable_If_Trigger_Conditions { get; set; }
+
+        public Shake_Event ShakeEvent { get; set; }
+        public Proximity_Event ProximityEvent { get; set; }
+
+        public TriggerCondition(TriggerConditionType type)
+        {
+            Type = type;
+            Require_Trigger_Conditions = new List<TriggerCondition>();
+            Disable_If_Trigger_Conditions = new List<TriggerCondition>();
+            ShakeEvent = new Shake_Event();
+            ProximityEvent = new Proximity_Event();
+        }
+
+        public bool CheckTrigger()
+        {
+            bool triggered = false;
+
+            switch (Type)
+            {
+                case TriggerConditionType.Shake_Vertical:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Shake_Horizontal:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Stab:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Twist:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Slash:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Swipe:
+                    if (ShakeEvent != null)
+                    {
+                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
+                        {
+
+                        }
+                    }
+                    break;
+                case TriggerConditionType.Proximity:
+                    if (ProximityEvent != null)
+                    {
+                        bool anyProxEventTriggered = false;
+
+                        foreach (TrackedObject objA in ProximityEvent.Device_Group_A)
+                        {
+                            foreach (TrackedObject objB in ProximityEvent.Device_Group_B)
+                            {
+
+                            }
+                        }
+
+                        if (anyProxEventTriggered)
+                        {
+                            if (!ProximityEvent.Invert)
+                            {
+                                triggered = true;
+                            }
+                        }
+                        else if (ProximityEvent.Invert)
+                        {
+                            triggered = true;
+                        }
+                    }
+                    break;
+            }
+
+            return triggered;
+        }
+     }
 
     public class ChangeAmount
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace XeRxKEYs.Gestures.Triggers.Actions
 {
@@ -21,16 +21,18 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
                 Directory.CreateDirectory(profilesFolderPath);
             }
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
+            JsonSerializerSettings options = new JsonSerializerSettings { Formatting = Formatting.Indented };
             foreach (TriggerAction profile in actionProfiles)
             {
+                profile.PrepareSerializableCombos();
+
                 if (string.IsNullOrWhiteSpace(profile.Name)) continue;
 
                 string filePath = Path.Combine(profilesFolderPath, profile.Name + ".json");
 
-                string jsonString = JsonSerializer.Serialize(profile, options);
+                string jsonString = JsonConvert.SerializeObject(profile, options);
 
-                File.WriteAllText(filePath, jsonString);
+                File.WriteAllText(filePath, jsonString); 
             }
         }
 
@@ -53,9 +55,10 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
                 string jsonString = File.ReadAllText(filePath);
                 try
                 {
-                    TriggerAction profile = JsonSerializer.Deserialize<TriggerAction>(jsonString);
+                    TriggerAction profile = JsonConvert.DeserializeObject<TriggerAction>(jsonString);
                     if (profile != null)
                     {
+                        profile.PrepareSendableInputs();
                         actionProfiles.Add(profile);
                     }
                 }

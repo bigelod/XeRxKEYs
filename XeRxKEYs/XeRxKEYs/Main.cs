@@ -24,8 +24,6 @@ namespace XeRxKEYs
         private const int inputSendTime = 5000;
         private System.Threading.Timer _keySenderTimer;
 
-        private InputHelper inputHelper;
-
         private bool sendLock = false;
 
         public GestureProfile ActiveGestureProfile = null;
@@ -57,7 +55,7 @@ namespace XeRxKEYs
             //TODO: Update this to send more frequently
             _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
 
-            inputHelper = new InputHelper();
+            InputHelper.GenerateSendableInputs();
 
             var settings = Properties.Settings.Default;
 
@@ -76,31 +74,9 @@ namespace XeRxKEYs
 
             SetupOutputModules(Properties.Settings.Default.OutModules);
 
-            LoadTriggerActions();
+            LoadAssets();
 
-            LoadMotionGestures();
-
-            LoadGestureProfiles();
-
-            //Create and save a Test Profile
-            TriggerAction c = new TriggerAction();
-            MotionGesture b = new MotionGesture("MotionTest");
-            GestureProfile a = new GestureProfile("GestureTest");
-
-            c.Name = "TriggerTest";
-            allTriggerActions.Add(c);
-
-            b.TriggerActions.Add(c);
-            allMotionGestures.Add(b);
-
-            a.Gestures.Add(b);
-            allGestureProfiles.Add(a);
-
-            SaveTriggerActions();
-
-            SaveMotionGestures();
-
-            SaveGestureProfiles();
+            AssetTest();
 
             if (settings.GestureProfile != "")
             {
@@ -111,6 +87,38 @@ namespace XeRxKEYs
                     this.WindowState = FormWindowState.Minimized;
                 }
             }
+        }
+
+        private void AssetTest()
+        {
+            //Create and save a Test Profile
+            TriggerAction c = new TriggerAction("TriggerTest");
+            MotionGesture b = new MotionGesture("MotionTest");
+            GestureProfile a = new GestureProfile("GestureTest");
+
+            SendableInputCombo d = new SendableInputCombo();
+
+            d.ComboInputs.Add(InputHelper.GetSendableInputByName("UP ARROW"));
+            d.ComboInputs.Add(InputHelper.GetSendableInputByName("RIGHT ARROW"));
+
+            c.InputCombos.Add(d);
+
+            SendableInputCombo f = new SendableInputCombo();
+
+            f.ComboInputs.Add(InputHelper.GetSendableInputByName("MOUSE LEFT CLICK"));
+            f.ComboInputs.Add(InputHelper.GetSendableInputByName("BACKSPACE"));
+
+            c.InputCombos.Add(f);
+
+            AddTriggerAction(c);
+
+            b.TriggerActions.Add(c);
+            AddMotionGesture(b);
+
+            a.Gestures.Add(b);
+            AddGestureProfile(a);
+
+            SaveAssets();
         }
 
         private void SetupOutputModules(string modules)
@@ -214,6 +222,81 @@ namespace XeRxKEYs
             //ActiveSendables.Clear();
 
             sendLock = false;
+        }
+
+        public void AddTriggerAction(TriggerAction action)
+        {
+            for (int i = allTriggerActions.Count - 1; i >= 0; i--)
+            {
+                if (allTriggerActions[i].Name == action.Name)
+                {
+                    allTriggerActions.RemoveAt(i);
+                    break;
+                }
+            }
+
+            allTriggerActions.Add(action);
+        }
+
+        public void AddMotionGesture(MotionGesture motion)
+        {
+            for (int i = allMotionGestures.Count - 1; i >= 0; i--)
+            {
+                if (allMotionGestures[i].Name == motion.Name)
+                {
+                    allMotionGestures.RemoveAt(i);
+                    break;
+                }
+            }
+
+            allMotionGestures.Add(motion);
+        }
+
+        public void AddGestureProfile(GestureProfile gesture)
+        {
+            for (int i = allGestureProfiles.Count - 1; i >= 0; i--)
+            {
+                if (allGestureProfiles[i].Name == gesture.Name)
+                {
+                    allGestureProfiles.RemoveAt(i);
+                    break;
+                }
+            }
+
+            allGestureProfiles.Add(gesture);
+        }
+
+        public List<TriggerAction> GetTriggerActions()
+        {
+            return allTriggerActions;
+        }
+
+        public List<MotionGesture> GetMotionGestures()
+        {
+            return allMotionGestures;
+        }
+
+        public List<GestureProfile> GetGestureProfiles()
+        {
+            return allGestureProfiles;
+        }
+
+        private void LoadAssets()
+        {
+            LoadTriggerActions();
+
+            LoadMotionGestures();
+
+            LoadGestureProfiles();
+        }
+
+        private void SaveAssets()
+        {
+            SaveTriggerActions();
+
+            SaveMotionGestures();
+
+            SaveGestureProfiles();
         }
 
         private void LoadTriggerActions()

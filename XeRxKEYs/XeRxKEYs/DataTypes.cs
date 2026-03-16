@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,15 @@ namespace XeRxKEYs
             X = x;
             Y = y;
             Z = z;
+        }
+
+        public static float Distance(Vector3 a, Vector3 b)
+        {
+            float dX = b.X - a.X;
+            float dY = b.Y - a.Y;
+            float dZ = b.Z - a.Z;
+
+            return (float)Math.Sqrt((dX * dX) + (dY * dY) + (dZ * dZ));
         }
     }
 
@@ -157,6 +167,18 @@ namespace XeRxKEYs
         public SendableInputCombo()
         {
             ComboInputs = new List<SendableInput>();
+        }
+
+        public static SerializableSendableCombo ToSerializable(SendableInputCombo a)
+        {
+            SerializableSendableCombo ans = new SerializableSendableCombo();
+
+            foreach (SendableInput input in a.ComboInputs)
+            {
+                ans.ComboInputs.Add(input.Name);
+            }
+
+            return ans;
         }
     }
 

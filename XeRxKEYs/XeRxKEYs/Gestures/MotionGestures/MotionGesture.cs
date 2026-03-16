@@ -33,5 +33,21 @@ namespace XeRxKEYs.Gestures.MotionGestures
             TriggerConditions = new List<TriggerCondition>();
             TriggerActions = new List<TriggerAction>();
         }
+
+        public void OnLoad()
+        {
+            foreach (TriggerAction action in TriggerActions)
+            {
+                action.PrepareSendableInputs();
+            }
+        }
+
+        public void OnSave()
+        {
+            foreach (TriggerAction action in TriggerActions)
+            {
+                action.PrepareSerializableCombos();
+            }
+        }
     }
 }

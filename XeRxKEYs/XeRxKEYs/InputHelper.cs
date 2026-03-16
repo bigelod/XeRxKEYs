@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -7,22 +8,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using WinApi;
 
 namespace XeRxKEYs
 {
-    public class InputHelper
+    public static class InputHelper
     {
-        public List<SendableInput> AllSendableInputs = new List<SendableInput>();
-        public List<SendableKey> AllSendableKeys = new List<SendableKey>();
+        public static List<SendableInput> AllSendableInputs = new List<SendableInput>();
+        public static List<SendableKey> AllSendableKeys = new List<SendableKey>();
 
-        public InputHelper()
+        public static void GenerateSendableInputs()
         {
-            GenerateSendableInputs();
-        }
+            AllSendableInputs.Clear();
 
-        private void GenerateSendableInputs()
-        {
             GenerateSendableKeys();
 
             //Keys
@@ -41,8 +40,10 @@ namespace XeRxKEYs
             AllSendableInputs.Add(new SendableInput(120, false));
         }
 
-        private void GenerateSendableKeys()
+        private static void GenerateSendableKeys()
         {
+            AllSendableKeys.Clear();
+
             //TODO
             //Letter keys
 
@@ -81,6 +82,102 @@ namespace XeRxKEYs
             AllSendableKeys.Add(new SendableKey("NUM LOCK", "{NUMLOCK}", (ushort)Keys.NumLock));
             AllSendableKeys.Add(new SendableKey("PRINT SCREEN", "{PRTSC}", (ushort)Keys.PrintScreen));
             AllSendableKeys.Add(new SendableKey("SCROLL LOCK", "{SCROLLLOCK}", (ushort)Keys.Scroll));
+        }
+
+        public static SendableInput GetSendableInputByName(string name)
+        {
+            SendableInput sendableInput = null;
+
+            foreach (SendableInput input in AllSendableInputs)
+            {
+                if (input.Name == name)
+                {
+                    sendableInput = input;
+                    break;
+                }
+            }
+
+            return sendableInput;
+        }
+
+        public static SendableInput GetSendableInputBySendKey(string sendKey)
+        {
+            SendableInput sendableInput = null;
+
+            foreach (SendableInput input in AllSendableInputs)
+            {
+                if (input.Type == SendType.Keyboard && input.SendKey.SendValue == sendKey)
+                {
+                    sendableInput = input;
+                    break;
+                }
+            }
+
+            return sendableInput;
+        }
+
+        public static SendableInput GetSendableInputByRawKeyValue(ushort value)
+        {
+            SendableInput sendableInput = null;
+
+            foreach (SendableInput input in AllSendableInputs)
+            {
+                if (input.Type == SendType.Keyboard && input.SendKey.RawValue == value)
+                {
+                    sendableInput = input;
+                    break;
+                }
+            }
+
+            return sendableInput;
+        }
+
+        public static SendableKey GetSendableKeyByName(string name)
+        {
+            SendableKey sendableKey = null;
+
+            foreach (SendableKey input in AllSendableKeys)
+            {
+                if (input.DisplayName == name)
+                {
+                    sendableKey = input;
+                    break;
+                }
+            }
+
+            return sendableKey;
+        }
+
+        public static SendableKey GetSendableKeyBySendKey(string sendKey)
+        {
+            SendableKey sendableKey = null;
+
+            foreach (SendableKey input in AllSendableKeys)
+            {
+                if (input.SendValue == sendKey)
+                {
+                    sendableKey = input;
+                    break;
+                }
+            }
+
+            return sendableKey;
+        }
+
+        public static SendableKey GetSendableKeyByRawKeyValue(ushort value)
+        {
+            SendableKey sendableKey = null;
+
+            foreach (SendableKey input in AllSendableKeys)
+            {
+                if (input.RawValue == value)
+                {
+                    sendableKey = input;
+                    break;
+                }
+            }
+
+            return sendableKey;
         }
     }
 }
