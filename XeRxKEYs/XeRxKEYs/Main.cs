@@ -38,7 +38,7 @@ namespace XeRxKEYs
         private List<TriggerAction> allTriggerActions = new List<TriggerAction>();
         private List<MotionGesture> allMotionGestures = new List<MotionGesture>();
         private List<GestureProfile> allGestureProfiles = new List<GestureProfile>();
-        
+
         public Main()
         {
             InitializeComponent();
@@ -288,6 +288,58 @@ namespace XeRxKEYs
             LoadMotionGestures();
 
             LoadGestureProfiles();
+
+            foreach (MotionGesture motion in allMotionGestures)
+            {
+                for (int i = 0; i < motion.TriggerActions.Count; i++)
+                {
+                    TriggerAction loadedAct = motion.TriggerActions[i];
+                    string actName = loadedAct.Name;
+
+                    bool actFound = false;
+
+                    foreach (TriggerAction globalAct in allTriggerActions)
+                    {
+                        if (actName == globalAct.Name)
+                        {
+                            actFound = true;
+                            motion.TriggerActions[i] = globalAct;
+                            break;
+                        }
+                    }
+
+                    if (!actFound)
+                    {
+                        allTriggerActions.Add(loadedAct);
+                    }
+                }
+            }
+
+            foreach (GestureProfile profile in allGestureProfiles)
+            {
+                for (int i = 0; i < profile.Gestures.Count; i++)
+                {
+                    MotionGesture loadedGesture = profile.Gestures[i];
+                    string gestureName = loadedGesture.Name;
+
+                    bool gestureFound = false;
+
+                    foreach (MotionGesture globalGesture in allMotionGestures)
+                    {
+                        if (gestureName == globalGesture.Name)
+                        {
+                            gestureFound = true;
+                            profile.Gestures[i] = globalGesture;
+                            break;
+                        }
+                    }
+
+                    if (!gestureFound)
+                    {
+                        allMotionGestures.Add(loadedGesture);
+                    }
+                }
+            }
         }
 
         private void SaveAssets()
@@ -313,7 +365,7 @@ namespace XeRxKEYs
         {
             GestureLoadSave.LoadProfiles(ref allGestureProfiles);
         }
-        
+
         private void SaveTriggerActions()
         {
             ActionLoadSave.SaveProfiles(allTriggerActions);

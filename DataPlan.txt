@@ -3,6 +3,10 @@
 -> Motion Gestures
 -> Actions (aka: macros)
 
+# During load, a higher level item (eg: Gesture Profiles > Motion Gestures > Actions) will name-match to existing loaded data rather than creating a new one unless it doesn't exist yet
+
+# During save, each layer will save with all the data below, so an entire motion gesture + action set could be shared from a single profile share
+
 # App also contains a built-in list of Trigger_Condition_Type
 
 Main_App::

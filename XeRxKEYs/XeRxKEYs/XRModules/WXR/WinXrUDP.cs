@@ -13,6 +13,7 @@ namespace XeRxKEYs.XRModules.WXR
     public class WinXrUDP
     {
         private int udpPortIN = 7872;
+        private int udpPortINFallback = 7873;
 
         private int udpPortOUT = 7278;
         private string targetIP = "127.0.0.1";
@@ -62,7 +63,14 @@ namespace XeRxKEYs.XRModules.WXR
 
         private void ReceiveData()
         {
-            udpClient = new UdpClient(udpPortIN);
+            try
+            {
+                udpClient = new UdpClient(udpPortIN);
+            }
+            catch
+            {
+                udpClient = new UdpClient(udpPortINFallback);
+            }
 
             while (true)
             {
