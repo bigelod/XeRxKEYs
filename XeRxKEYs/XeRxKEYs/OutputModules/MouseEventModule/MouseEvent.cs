@@ -11,6 +11,7 @@ using WinApi;
 
 namespace XeRxKEYs.OutputModules.MouseEvent
 {
+    //Works in WinlatorXR testing, but unused due to alternative method (InputAPI)
     public class MouseEvent : IOutModule
     {
         public string DisplayName { get; set; }
@@ -32,25 +33,19 @@ namespace XeRxKEYs.OutputModules.MouseEvent
 
         public void SendInput(List<SendableInput> inputs)
         {
-            //inputHelper.ScrollMouseWheelFallback(120);
-            //Thread.Sleep(1500);
-            //inputHelper.ScrollMouseWheelFallback(-120);
-
-            //inputHelper.SendMouseClickFallback(WindowsAPI.MOUSEEVENTF_RIGHTDOWN, WindowsAPI.MOUSEEVENTF_RIGHTUP);
-
             foreach (SendableInput input in inputs)
             {
                 if (input.Type == SendType.MouseMove)
                 {
-                    //MoveMouse?
+                    //MoveMouse? Currently unsupported
                 }
                 else if (input.Type == SendType.MouseScroll)
                 {
-                    //ScrollMouseWheel
+                    ScrollMouseWheel(input.MouseScrollAmount);
                 }
                 else if (input.Type == SendType.MouseClick)
                 {
-                    //SendMouseClick
+                    SendMouseClick(input.MouseButtonDownFlag, input.MouseButtonUpFlag);
                 }
             }
         }

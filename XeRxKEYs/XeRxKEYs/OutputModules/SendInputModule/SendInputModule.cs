@@ -11,6 +11,7 @@ using WinApi;
 
 namespace XeRxKEYs.OutputModules.SendInputModule
 {
+    //Currently unfinished as it wasn't working as hoped
     public class SendInputModule : IOutModule
     {
         public string DisplayName { get; set; }
@@ -41,46 +42,24 @@ namespace XeRxKEYs.OutputModules.SendInputModule
 
         public void SendInput(List<SendableInput> inputs)
         {
-            //inputHelper.PressKey('w', true);
-            //Thread.Sleep(100);
-            //inputHelper.PressKey('w', false);
-            //Thread.Sleep(100);
-            //inputHelper.PressKey('a', true);
-            //Thread.Sleep(100);
-            //inputHelper.PressKey('a', false);
-
-            //int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-            //int screenHeight = Screen.PrimaryScreen.Bounds.Height;
-            //int targetX = screenWidth / 2;
-            //int targetY = screenHeight / 2;
-
-            //inputHelper.MoveMouse(targetX, targetY);
-
-            //Thread.Sleep(100);
-
-            //inputHelper.SendMouseClick(WindowsAPI.MOUSEEVENTF_RIGHTDOWN, WindowsAPI.MOUSEEVENTF_RIGHTUP, 100);
-
-            //Thread.Sleep(100);
-
-            //inputHelper.ScrollMouseWheel(-120);
-
             foreach (SendableInput input in inputs)
             {
                 if (input.Type == SendType.Keyboard)
                 {
-                    //PressKey
+                    //TODO: Update this to support more than just a character send, eg: symbols and arrows
+                    PressKey(char.Parse(input.SendKey.DisplayName.Substring(0,1)), false);
                 }
                 else if (input.Type == SendType.MouseMove)
                 {
-                    //MoveMouse
+                    MoveMouse(input.MouseX, input.MouseY);
                 }
                 else if (input.Type == SendType.MouseScroll)
                 {
-                    //ScrollMouseWheel
+                    ScrollMouseWheel(input.MouseScrollAmount);
                 }
                 else if (input.Type == SendType.MouseClick)
                 {
-                    //SendMouseClick
+                    SendMouseClick(input.MouseButtonDownFlag, input.MouseButtonUpFlag);
                 }
             }
         }

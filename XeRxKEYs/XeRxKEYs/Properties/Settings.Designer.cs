@@ -61,7 +61,7 @@ namespace XeRxKEYs.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SendKeysModule,WinXROut,SendInputModule")]
+        [global::System.Configuration.DefaultSettingValueAttribute("WinXROut")]
         public string OutModules {
             get {
                 return ((string)(this["OutModules"]));
