@@ -16,6 +16,7 @@ namespace XeRxKEYs
     public static class InputHelper
     {
         public static List<SendableInput> AllSendableInputs = new List<SendableInput>();
+        public static List<SendableInput> AllSendableMouseInputs = new List<SendableInput>();
         public static List<SendableKey> AllSendableKeys = new List<SendableKey>();
 
         public static void GenerateSendableInputs()
@@ -24,20 +25,19 @@ namespace XeRxKEYs
 
             GenerateSendableKeys();
 
+            GenerateSendableMouseInputs();
+
             //Keys
             foreach (SendableKey key in AllSendableKeys)
             {
                 AllSendableInputs.Add(new SendableInput(key));
             }
 
-            //Mouse buttons
-            AllSendableInputs.Add(new SendableInput(0));
-            AllSendableInputs.Add(new SendableInput(1));
-            AllSendableInputs.Add(new SendableInput(2));
-
-            //Mouse scroll events
-            AllSendableInputs.Add(new SendableInput(120, true));
-            AllSendableInputs.Add(new SendableInput(120, false));
+            //Mouse
+            foreach (SendableInput input in AllSendableMouseInputs)
+            {
+                AllSendableInputs.Add(input);
+            }
         }
 
         private static void GenerateSendableKeys()
@@ -83,12 +83,47 @@ namespace XeRxKEYs
             AllSendableKeys.Add(new SendableKey("PRINT SCREEN", "{PRTSC}", (ushort)Keys.PrintScreen));
             AllSendableKeys.Add(new SendableKey("SCROLL LOCK", "{SCROLLLOCK}", (ushort)Keys.Scroll));
         }
+        private static void GenerateSendableMouseInputs()
+        {
+            AllSendableMouseInputs.Clear();
+
+            //Mouse buttons
+            SendableInput mouseLeftClick = new SendableInput(0);
+            SendableInput mouseRightClick = new SendableInput(1);
+            SendableInput mouseMiddleClick = new SendableInput(2);
+
+            //Mouse scroll events
+            SendableInput mouseScrollUp = new SendableInput(120, false);
+            SendableInput mouseScrollDown = new SendableInput(120, true);
+
+            AllSendableMouseInputs.Add(mouseLeftClick);
+            AllSendableMouseInputs.Add(mouseRightClick);
+            AllSendableMouseInputs.Add(mouseMiddleClick);
+            AllSendableMouseInputs.Add(mouseScrollUp);
+            AllSendableMouseInputs.Add(mouseScrollDown);
+        }
 
         public static SendableInput GetSendableInputByName(string name)
         {
             SendableInput sendableInput = null;
 
             foreach (SendableInput input in AllSendableInputs)
+            {
+                if (input.Name == name)
+                {
+                    sendableInput = input;
+                    break;
+                }
+            }
+
+            return sendableInput;
+        }
+
+        public static SendableInput GetSendableMouseInputByName(string name)
+        {
+            SendableInput sendableInput = null;
+
+            foreach (SendableInput input in AllSendableMouseInputs)
             {
                 if (input.Name == name)
                 {
