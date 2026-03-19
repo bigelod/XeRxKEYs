@@ -71,6 +71,13 @@ namespace XeRxKEYs.OutputModules.WXRModule
         {
             try
             {
+                string inputVersionFile = dataDirectory + "/input_version";
+
+                if (File.Exists(inputVersionFile))
+                {
+                    File.Delete(inputVersionFile);
+                }
+
                 transmitClient.Close();
             }
             catch (Exception e)
