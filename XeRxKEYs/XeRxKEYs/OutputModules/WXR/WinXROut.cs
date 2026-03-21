@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XeRxKEYs.OutputModules.WXR;
 
 namespace XeRxKEYs.OutputModules.WXRModule
 {
@@ -92,24 +93,53 @@ namespace XeRxKEYs.OutputModules.WXRModule
 
         public void SendInput(List<SendableInput> inputs)
         {
+            List<string> sendKeys = new List<string>();
+
+            int leftClick = 0;
+            int rightClick = 0;
+            int middleClick = 0;
+            int scrollUp = 0;
+            int scrollDown = 0;
+
             foreach (SendableInput input in inputs)
             {
                 if (input.Type == SendType.Keyboard)
                 {
-                    //PressKey
+                    sendKeys.Add(input.SendKey.AltValue);
                 }
                 else if (input.Type == SendType.MouseMove)
                 {
-                    //MoveMouse
+                    //Not supported at this time
                 }
                 else if (input.Type == SendType.MouseScroll)
                 {
-                    //ScrollMouseWheel
+                    if (input.MouseScrollAmount >= 0)
+                    {
+                        //UP
+                        scrollUp = 1;
+                    }
+                    else
+                    {
+                        //Down
+                        scrollDown = 1;
+                    }
                 }
                 else if (input.Type == SendType.MouseClick)
                 {
-                    //SendMouseClick
+                    if (input.MouseButton == 0) leftClick = 1;
+                    if (input.MouseButton == 1) rightClick = 1;
+                    if (input.MouseButton == 2) middleClick = 1;
                 }
+            }
+
+            if (sendKeys.Count > 0)
+            {
+                SendData(XKeycode.ToKeyCombo(sendKeys));
+            }
+
+            if (leftClick + rightClick + middleClick + scrollUp + scrollDown > 0)
+            {
+                SendData("M," + leftClick.ToString() + "," + rightClick.ToString() + "," + middleClick.ToString() + "," + scrollUp.ToString() + "," + scrollDown.ToString());
             }
         }
 

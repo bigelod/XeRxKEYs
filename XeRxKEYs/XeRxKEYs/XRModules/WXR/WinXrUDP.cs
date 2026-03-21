@@ -36,22 +36,22 @@ namespace XeRxKEYs.XRModules.WXR
             udpReadThread.Start();
         }
 
-        public void SendHapticVibration(float lControllerVibration, float rControllerVibration, string vrFlag = "2", string sbsFlag = "0")
+        public void SendHapticVibration(float lControllerVibration, float rControllerVibration, string vrFlag = "3", string sbsFlag = "0")
         {
             //V0.2 now takes L Vibration, R Vibration, VR flag, SBS flag, target FOV W, target FOV H
             float lCV = Math.Max(0f, lControllerVibration);
             float rCV = Math.Max(0f, rControllerVibration);
 
+            string lVibe = lCV.ToString("0.00");
+            string rVibe = rCV.ToString("0.00");
+
             if (lCV + rCV == 0)
             {
-                SendData("0 0 " + vrFlag + " " + sbsFlag + " 104.5 104.5");
+                lVibe = "0";
+                rVibe = "0";
             }
-            else
-            {
-                string vibeData = lCV.ToString("0.00") + " " + rCV.ToString("0.00");
 
-                SendData(vibeData + " 1 " + vrFlag + " " + sbsFlag + " 104.5 104.5");
-            }
+            SendData(lVibe + " " + rVibe + " 1 " + vrFlag + " " + sbsFlag + " 104.5 104.5");
         }
 
         public void SendData(string data)
@@ -88,7 +88,7 @@ namespace XeRxKEYs.XRModules.WXR
                 }
                 catch (Exception e)
                 {
-                    
+
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace XeRxKEYs.XRModules.WXR
             }
             catch (Exception e)
             {
-                
+
             }
         }
     }

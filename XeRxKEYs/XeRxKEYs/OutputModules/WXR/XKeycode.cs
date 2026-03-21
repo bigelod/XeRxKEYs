@@ -28,6 +28,8 @@ namespace XeRxKEYs.OutputModules.WXR
 
             inKey = FilterKeys(inKey);
 
+            if (inKey == "") return ans;
+
             string upperCase = "50,";
 
             //KEY_CTRL_L(37),
