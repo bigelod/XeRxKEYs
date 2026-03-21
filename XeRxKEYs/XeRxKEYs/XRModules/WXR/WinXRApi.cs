@@ -84,9 +84,9 @@ namespace XeRxKEYs.XRModules.WXR
         public WinXRApi()
         {
             DisplayName = "WinlatorXR XrAPI";
-            Head = new TrackedObject();
-            L_Hand = new TrackedObject();
-            R_Hand = new TrackedObject();
+            Head = new TrackedObject("Head");
+            L_Hand = new TrackedObject("Left Hand");
+            R_Hand = new TrackedObject("Right Hand");
         }
 
         public void Setup()
@@ -218,7 +218,7 @@ namespace XeRxKEYs.XRModules.WXR
             return ans;
         }
 
-        public void ReceiveData(string data)
+        public void ReceiveData(string data, float deltaTime)
         {
             if (!lockFrameData)
             {

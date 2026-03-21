@@ -23,9 +23,11 @@ namespace XeRxKEYs.XRModules.WXR
 
         private UdpClient transmitClient;
 
-        private Action<string> receiveAction;
+        private Action<string, float> receiveAction;
 
-        public WinXrUDP(Action<string> act)
+        private int lastTickCount;
+
+        public WinXrUDP(Action<string, float> act)
         {
             receiveAction = act;
 
@@ -72,6 +74,8 @@ namespace XeRxKEYs.XRModules.WXR
                 udpClient = new UdpClient(udpPortINFallback);
             }
 
+            lastTickCount = Environment.TickCount;
+
             while (true)
             {
                 try
@@ -79,11 +83,21 @@ namespace XeRxKEYs.XRModules.WXR
                     IPEndPoint recieveFromAnyIP = new IPEndPoint(IPAddress.Any, 0);
                     byte[] data = udpClient.Receive(ref recieveFromAnyIP);
 
+                    int currentTickCount = Environment.TickCount;
+
+                    int elapsedMilliseconds = currentTickCount - lastTickCount;
+                    
+                    lastTickCount = currentTickCount;
+
+                    float deltaTime = (float)elapsedMilliseconds / 1000.0f;
+
                     string returnData = Encoding.ASCII.GetString(data);
+
+                    if (deltaTime < 0) deltaTime = 0;
 
                     if (receiveAction != null)
                     {
-                        receiveAction.Invoke(returnData);
+                        receiveAction.Invoke(returnData, deltaTime);
                     }
                 }
                 catch (Exception e)
