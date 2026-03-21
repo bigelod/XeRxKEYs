@@ -23,9 +23,10 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
         public List<TriggerAction> TriggerActions { get; set; }
 
-        public MotionGesture(string _name, string _img = "")
+        public MotionGesture(string _name, string _desc = "", string _img = "")
         {
             Name = _name;
+            Description = _desc;
             Image = _img;
             Sensitivity = 1.0f;
             Cooldown = 0.0f;

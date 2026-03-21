@@ -105,6 +105,7 @@
     <Compile Include="OutputModules\SendKeysModule\SendKeys.cs" />
     <Compile Include="OutputModules\WXR\WinXROut.cs" />
     <Compile Include="OutputModules\WXR\XKeycode.cs" />
+    <Compile Include="TrackedObject.cs" />
     <Compile Include="WinApi.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

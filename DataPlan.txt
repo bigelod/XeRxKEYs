@@ -41,6 +41,9 @@ XRModule::
 OutputModule::
 -> Name //The name of the output module, used for sending data in various formats
 
+#Future output module ideas
+-> SteamVR tracking for use on PC / potential Steam Frame support?
+
 =============================
 Gesture recording formats:
 =============================
@@ -107,3 +110,6 @@ Key_Combo::
 Key::
 -> KeyCode (Char) //Key code to trigger
 -> Hold_Time (Float) //How long to hold the key for, regardless of whether the action has moved onto next key)
+
+#Future key sending module ideas
+-> Finish SendInput / get it working on Windows for SteamVR users

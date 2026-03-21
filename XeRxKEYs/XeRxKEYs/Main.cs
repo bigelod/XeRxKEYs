@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime;
@@ -13,8 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinApi;
-using XeRxKEYs.Gestures.MotionGestures;
 using XeRxKEYs.Gestures.GestureProfiles;
+using XeRxKEYs.Gestures.MotionGestures;
 using XeRxKEYs.Gestures.Triggers.Actions;
 
 namespace XeRxKEYs
@@ -59,7 +60,49 @@ namespace XeRxKEYs
 
             var settings = Properties.Settings.Default;
 
-            if (!SetupInputModule(settings.XRModule))
+            string xrMod = settings.XRModule;
+            string outMods = settings.OutModules;
+            string gestureProfile = settings.GestureProfile;
+            string launchOnStart = "";
+
+            //Parse the input arguments
+            string[] args = Environment.GetCommandLineArgs();
+            for (int i = 1; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "-module":
+                        if (i + 1 < args.Length)
+                        {
+                            xrMod = args[i + 1];
+                            i++;
+                        }
+                        break;
+                    case "-outmod":
+                        if (i + 1 < args.Length)
+                        {
+                            outMods = args[i + 1];
+                            i++;
+                        }
+                        break;
+                    case "-profile":
+                        if (i + 1 < args.Length)
+                        {
+                            gestureProfile = args[i + 1];
+                            i++;
+                        }
+                        break;
+                    case "-launch":
+                        if (i + 1 < args.Length)
+                        {
+                            launchOnStart = args[i + 1];
+                            i++;
+                        }
+                        break;
+                }
+            }
+
+            if (!SetupInputModule(xrMod))
             {
                 MessageBox.Show(this, "Input module not found! Setting back to default", "XeRxKEYs - Error loading Input module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 settings.XRModule = "WinXRApi";
@@ -72,19 +115,40 @@ namespace XeRxKEYs
                 }
             }
 
-            SetupOutputModules(Properties.Settings.Default.OutModules);
+            SetupOutputModules(outMods);
 
             LoadAssets();
 
             AssetTest();
 
-            if (settings.GestureProfile != "")
+            if (gestureProfile != "")
             {
                 //Try to enable the active Gesture Profile
+
 
                 if (settings.MinimizeAtStart)
                 {
                     this.WindowState = FormWindowState.Minimized;
+                }
+            }
+
+            if (launchOnStart != "")
+            {
+                try
+                {
+                    string exeDir = Path.GetDirectoryName(launchOnStart);
+
+                    if (Directory.Exists(exeDir))
+                    {
+                        if (File.Exists(launchOnStart))
+                        {
+                            Process.Start(launchOnStart);
+                        }
+                    }
+                }
+                catch
+                {
+
                 }
             }
         }

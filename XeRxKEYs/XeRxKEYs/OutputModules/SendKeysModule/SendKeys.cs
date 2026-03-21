@@ -11,7 +11,6 @@ using WinApi;
 
 namespace XeRxKEYs.OutputModules.SendKeysModule
 {
-    //Currently unfinished as it wasn't working as hoped
     public class SendKeysModule : IOutModule
     {
         public string DisplayName { get; set; }
