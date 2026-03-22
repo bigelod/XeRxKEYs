@@ -278,12 +278,27 @@ namespace XeRxKEYs
 
             sendLock = true;
 
+            //Check all Trigger Actions to prepare the active sendables list, then send them
+            if (ActiveGestureProfile != null)
+            {
+                foreach (MotionGesture gesture in ActiveGestureProfile.Gestures)
+                {
+                    ActiveSendables.AddRange(gesture.GatherInputs());
+                }
+            }
+
+            //Finished checking all Trigger Actions
+            if (xrModuleInstance != null)
+            {
+                xrModuleInstance.TriggersComplete();
+            }
+
             foreach (IOutModule module in activeOutModules)
             {
                 module.SendInput(ActiveSendables);
             }
 
-            //ActiveSendables.Clear();
+            ActiveSendables.Clear();
 
             sendLock = false;
         }

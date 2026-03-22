@@ -68,11 +68,10 @@ Trigger_Condition::
 Trigger_Condition_Type::
 -> Image (PNG) //To show in the trigger type selection list
 -> Shake_Vertical (Shake_Event) //Shake the device vertically to trigger, Y axis relative to "forward" of HMD
--> Shake_Horizontal (Shake_Event) //Shake the device horizontally to trigger, X axis relative to "forward" of HMD
+-> Swipe (Shake_Event) //Swipe the device like a horizontal card reader
 -> Stab (Shake_Event) //Stab the device forward like a knife to trigger, Z axis relative to "forward" of HMD
 -> Twist (Shake_Event) //Twist the device like a doorhandle relative to "forward" of HMD
 -> Slash (Shake_Event) //Slash the device forward like a sword
--> Swipe (Shake_Event) //Swipe the device like a horizontal card reader
 -> Proximity (Proximity_Event) //Trigger when two or more devices are in proximity to each other
 
 #Future trigger type ideas:

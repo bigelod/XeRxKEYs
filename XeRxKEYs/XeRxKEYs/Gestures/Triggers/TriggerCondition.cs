@@ -12,7 +12,6 @@ namespace XeRxKEYs.Gestures.Triggers
     public enum TriggerConditionType
     {
         Shake_Vertical,
-        Shake_Horizontal,
         Stab,
         Twist,
         Slash,
@@ -24,8 +23,8 @@ namespace XeRxKEYs.Gestures.Triggers
     {
         public TriggerConditionType Type { get; set; }
 
-        public List<TriggerCondition> Require_Trigger_Conditions { get; set; }
-        public List<TriggerCondition> Disable_If_Trigger_Conditions { get; set; }
+        public List<TriggerCondition> Require_Trigger_Conditions { get; set; } //TODO: Check these other triggers to see if we can activate
+        public List<TriggerCondition> Disable_If_Trigger_Conditions { get; set; } //TODO: Check these other triggers to see if we CANT activate
 
         public Shake_Event ShakeEvent { get; set; }
         public Proximity_Event ProximityEvent { get; set; }
@@ -50,16 +49,7 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
                         {
-
-                        }
-                    }
-                    break;
-                case TriggerConditionType.Shake_Horizontal:
-                    if (ShakeEvent != null)
-                    {
-                        foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
-                        {
-
+                            if (obj.DidShake()) triggered = true;
                         }
                     }
                     break;
@@ -68,7 +58,7 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
                         {
-
+                            if (obj.DidStab()) triggered = true;
                         }
                     }
                     break;
@@ -77,7 +67,7 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
                         {
-
+                            if (obj.DidTwist()) triggered = true;
                         }
                     }
                     break;
@@ -86,7 +76,7 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
                         {
-
+                            if (obj.DidSlash()) triggered = true;
                         }
                     }
                     break;
@@ -95,7 +85,7 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         foreach (TrackedObject obj in ShakeEvent.Trigger_For_Objects)
                         {
-
+                            if (obj.DidSwipe()) triggered = true;
                         }
                     }
                     break;
@@ -150,7 +140,7 @@ namespace XeRxKEYs.Gestures.Triggers
     {
         public List<TrackedObject> Trigger_For_Objects { get; set; } //Which object(s) can trigger this condition?
 
-        public ChangeAmount Trigger_When { get; set; } //Trigger when shaken by this amount
+        public ChangeAmount Trigger_When { get; set; } //TODO: Use this to modify the values of the shake event(s) of a given TrackedObject
 
         public Shake_Event()
         {

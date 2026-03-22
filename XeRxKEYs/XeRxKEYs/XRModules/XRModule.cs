@@ -18,5 +18,6 @@ namespace XeRxKEYs
 
         void SendCommand(string cmd);
         string RequestData(string request);
+        void TriggersComplete();
     }
 }

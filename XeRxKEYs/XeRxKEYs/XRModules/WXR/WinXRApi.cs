@@ -87,6 +87,8 @@ namespace XeRxKEYs.XRModules.WXR
             Head = new TrackedObject("Head");
             L_Hand = new TrackedObject("Left Hand");
             R_Hand = new TrackedObject("Right Hand");
+
+            TrackedObject.hmdObj = Head;
         }
 
         public void Setup()
@@ -316,8 +318,28 @@ namespace XeRxKEYs.XRModules.WXR
                     isSBS = ParseBtnBool(btnbools, 20);
                 }
 
+                Vector3 newHeadPos = new Vector3();
+                Quaternion newHeadRot = new Quaternion();
+                Vector3 newLHandPos = new Vector3();
+                Quaternion newLHandRot = new Quaternion();
+                Vector3 newRHandPos = new Vector3();
+                Quaternion newRHandRot = new Quaternion();
+
+                //TODO: Parse the data above into the TrackedObjects
+
+                Head.Update(newHeadPos, newHeadRot, deltaTime);
+                L_Hand.Update(newLHandPos, newLHandRot, deltaTime);
+                R_Hand.Update(newRHandPos, newRHandRot, deltaTime);
+
                 lockFrameData = false;
             }
+        }
+
+        public void TriggersComplete()
+        {
+            Head.ClearTriggers();
+            L_Hand.ClearTriggers();
+            R_Hand.ClearTriggers();
         }
 
         private void UpdateValue(ref float currValue, float newValue)
