@@ -319,12 +319,12 @@ namespace XeRxKEYs.XRModules.WXR
                     isSBS = ParseBtnBool(btnbools, 20);
                 }
 
-                Vector3 newHeadPos = new Vector3();
-                Quaternion newHeadRot = new Quaternion();
-                Vector3 newLHandPos = new Vector3();
-                Quaternion newLHandRot = new Quaternion();
-                Vector3 newRHandPos = new Vector3();
-                Quaternion newRHandRot = new Quaternion();
+                Vector3 newHeadPos = new Vector3(currHMDX, currHMDY, currHMDZ);
+                Quaternion newHeadRot = new Quaternion(currHMDQX, currHMDQY, currHMDQZ, currHMDQW);
+                Vector3 newLHandPos = new Vector3(currLHandX, currLHandY, currLHandZ);
+                Quaternion newLHandRot = new Quaternion(currLHandQX, currLHandQY, currLHandQZ, currLHandQW);
+                Vector3 newRHandPos = new Vector3(currRHandX, currRHandY, currRHandZ);
+                Quaternion newRHandRot = new Quaternion(currRHandQX, currRHandQY, currRHandQZ, currRHandQW);
 
                 Head.Update(newHeadPos, newHeadRot, deltaTime);
                 L_Hand.Update(newLHandPos, newLHandRot, deltaTime);

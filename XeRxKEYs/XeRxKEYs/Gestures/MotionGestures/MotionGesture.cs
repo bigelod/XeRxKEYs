@@ -19,13 +19,15 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
         public float Sensitivity { get; set; } //TODO: Support passing sensitivity to the TriggerConditions
 
-        public float Cooldown { get; set; } //TODO: Support a cooldown so this can't trigger back-to-back if so
+        public float Cooldown { get; set; }
 
         public List<TriggerCondition> TriggerConditions { get; set; }
 
         public List<TriggerAction> TriggerActions { get; set; }
 
-        public bool TriggerOnAnyCondition { get; set; } //Trigger if any condition is true?
+        public bool TriggerOnAnyCondition { get; set; }
+
+        private float cooldownTimer = 0f;
 
         public MotionGesture(string _name, string _desc = "", string _img = "", bool _triggerAny = false)
         {
@@ -86,7 +88,7 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
         private bool CheckConditions()
         {
-            if (TriggerConditions.Count <= 0) return false;
+            if (TriggerConditions.Count <= 0 || cooldownTimer > 0) return false;
 
             bool anyFound = false;
 
@@ -95,7 +97,11 @@ namespace XeRxKEYs.Gestures.MotionGestures
                 if (condition.CheckTrigger())
                 {
                     anyFound = true;
-                    if (TriggerOnAnyCondition) return true;
+                    if (TriggerOnAnyCondition)
+                    {
+                        cooldownTimer = Cooldown;
+                        return true;
+                    }
                 }
                 else
                 {
@@ -103,7 +109,16 @@ namespace XeRxKEYs.Gestures.MotionGestures
                 }
             }
 
+            if (anyFound) cooldownTimer = Cooldown;
+
             return anyFound;
+        }
+
+        public void UpdateCooldown(float msPassed)
+        {
+            cooldownTimer -= msPassed / 1000;
+
+            if (cooldownTimer <= 0) cooldownTimer = 0;
         }
     }
 }

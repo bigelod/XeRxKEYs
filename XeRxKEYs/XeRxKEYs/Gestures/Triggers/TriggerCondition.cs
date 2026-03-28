@@ -51,12 +51,14 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         ShakeEvent.PrepareTrackedObjects(ref xrModuleInstance);
                     }
+                    ProximityEvent = new Proximity_Event();
                     break;
                 case TriggerConditionType.Proximity:
                     if (ProximityEvent != null)
                     {
                         ProximityEvent.PrepareTrackedObjects(ref xrModuleInstance);
                     }
+                    ShakeEvent = new Shake_Event();
                     break;
             }
 
@@ -84,12 +86,14 @@ namespace XeRxKEYs.Gestures.Triggers
                     {
                         ShakeEvent.PrepareSerializableTrackedObjects();
                     }
+                    ProximityEvent = null;
                     break;
                 case TriggerConditionType.Proximity:
                     if (ProximityEvent != null)
                     {
                         ProximityEvent.PrepareSerializableTrackedObjects();
                     }
+                    ShakeEvent = null;
                     break;
             }
 

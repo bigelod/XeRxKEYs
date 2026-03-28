@@ -26,6 +26,9 @@ namespace XeRxKEYs
         private const int inputSendTime = 5000;
         private System.Threading.Timer _keySenderTimer;
 
+        private const int cooldownTimeMS = 100;
+        private System.Threading.Timer _cooldownTimer;
+
         private bool sendLock = false;
 
         public GestureProfile ActiveGestureProfile = null;
@@ -54,8 +57,8 @@ namespace XeRxKEYs
             FormClosing += Main_FormClosing;
             niTaskbarIcon.MouseUp += niTaskbarIcon_MouseUp;
 
-            //TODO: Update this to send more frequently
             _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
+            _cooldownTimer = new System.Threading.Timer(CooldownCallback, null, cooldownTimeMS, cooldownTimeMS);
 
             InputHelper.GenerateSendableInputs();
 
@@ -526,6 +529,17 @@ namespace XeRxKEYs
             {
                 SendKeysToForegroundWindow(myOwnHandle);
             }
+        }
+
+        private void CooldownCallback(object state)
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+                foreach (MotionGesture gesture in allMotionGestures)
+                {
+                    gesture.UpdateCooldown(cooldownTimeMS);
+                }
+            });
         }
 
         private void ShowWindow()

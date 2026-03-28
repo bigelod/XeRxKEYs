@@ -1,0 +1,19 @@
+{
+  "Name": "TriggerTest",
+  "Description": "",
+  "WaitTime": 0.0,
+  "SerializableInputCombos": [
+    {
+      "ComboInputs": [
+        "UP ARROW",
+        "RIGHT ARROW"
+      ]
+    },
+    {
+      "ComboInputs": [
+        "MOUSE LEFT CLICK",
+        "BACKSPACE"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "Name": "GestureTest",
+  "Image": "",
+  "Description": "",
+  "Gestures": [
+    {
+      "Name": "MotionTest",
+      "Image": "",
+      "Description": "",
+      "Sensitivity": 1.0,
+      "Cooldown": 0.0,
+      "TriggerConditions": [
+        {
+          "Type": 0,
+          "Require_Trigger_Conditions": [],
+          "Disable_If_Trigger_Conditions": [],
+          "ShakeEvent": {
+            "SerializableTriggerForObjects": [
+              {
+                "TrackedObjectName": "Left Hand"
+              }
+            ],
+            "Trigger_When": {
+              "MinValue": 0.0,
+              "MaxValue": 0.0,
+              "Duration": 0.33,
+              "SensitivityScale": 1.0
+            }
+          },
+          "ProximityEvent": null
+        },
+        {
+          "Type": 5,
+          "Require_Trigger_Conditions": [],
+          "Disable_If_Trigger_Conditions": [],
+          "ShakeEvent": null,
+          "ProximityEvent": {
+            "SerializableDeviceGroupA": [
+              {
+                "TrackedObjectName": "Head"
+              }
+            ],
+            "SerializableDeviceGroupB": [
+              {
+                "TrackedObjectName": "Right Hand"
+              }
+            ],
+            "Trigger_When": {
+              "MinValue": 0.0,
+              "MaxValue": 0.0,
+              "Duration": 0.33,
+              "SensitivityScale": 1.0
+            },
+            "Invert": false,
+            "TriggerOnce": false
+          }
+        }
+      ],
+      "TriggerActions": [
+        {
+          "Name": "TriggerTest",
+          "Description": "",
+          "WaitTime": 0.0,
+          "SerializableInputCombos": [
+            {
+              "ComboInputs": [
+                "UP ARROW",
+                "RIGHT ARROW"
+              ]
+            },
+            {
+              "ComboInputs": [
+                "MOUSE LEFT CLICK",
+                "BACKSPACE"
+              ]
+            }
+          ]
+        }
+      ],
+      "TriggerOnAnyCondition": true
+    }
+  ]
+}
