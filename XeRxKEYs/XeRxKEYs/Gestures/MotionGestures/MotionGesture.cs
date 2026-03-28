@@ -12,6 +12,7 @@ namespace XeRxKEYs.Gestures.MotionGestures
 {
     public class MotionGesture
     {
+        public SerializableJSONDataType Type = SerializableJSONDataType.MOTIONGESTURE;
         public string Name { get; set; }
 
         public string Image { get; set; }
@@ -36,6 +37,8 @@ namespace XeRxKEYs.Gestures.MotionGestures
             Image = _img;
             Sensitivity = 1.0f;
             Cooldown = 0.0f;
+
+            cooldownTimer = 0f;
 
             TriggerConditions = new List<TriggerCondition>();
             TriggerActions = new List<TriggerAction>();
@@ -119,6 +122,11 @@ namespace XeRxKEYs.Gestures.MotionGestures
             cooldownTimer -= msPassed / 1000;
 
             if (cooldownTimer <= 0) cooldownTimer = 0;
+        }
+
+        public void ClearCooldown()
+        {
+            cooldownTimer = 0f;
         }
     }
 }

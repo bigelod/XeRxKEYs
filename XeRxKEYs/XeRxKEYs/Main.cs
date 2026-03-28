@@ -18,12 +18,14 @@ using XeRxKEYs.Gestures.GestureProfiles;
 using XeRxKEYs.Gestures.MotionGestures;
 using XeRxKEYs.Gestures.Triggers;
 using XeRxKEYs.Gestures.Triggers.Actions;
+using XeRxKEYs.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace XeRxKEYs
 {
     public partial class Main : Form
     {
-        private const int inputSendTime = 5000;
+        private const int inputSendTime = 5000; //TODO: Send input more frequently than once every 5 seconds once testing is further along
         private System.Threading.Timer _keySenderTimer;
 
         private const int cooldownTimeMS = 100;
@@ -56,6 +58,8 @@ namespace XeRxKEYs
             Resize += Main_Resize;
             FormClosing += Main_FormClosing;
             niTaskbarIcon.MouseUp += niTaskbarIcon_MouseUp;
+
+            tcDisplayTabs.SelectedIndexChanged += tcDisplayTabs_SelectedIndexChanged;
 
             _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
             _cooldownTimer = new System.Threading.Timer(CooldownCallback, null, cooldownTimeMS, cooldownTimeMS);
@@ -123,12 +127,18 @@ namespace XeRxKEYs
 
             LoadAssets();
 
+            //TODO: Remove call to AssetTest
             AssetTest();
 
             if (gestureProfile != "")
             {
-                //Try to enable the active Gesture Profile
-
+                foreach (GestureProfile profile in allGestureProfiles)
+                {
+                    if (profile.Name == gestureProfile)
+                    {
+                        ActiveGestureProfile = profile;
+                    }
+                }
 
                 if (settings.MinimizeAtStart)
                 {
@@ -155,61 +165,11 @@ namespace XeRxKEYs
 
                 }
             }
+
+            RefreshMainUI(true);
         }
 
-        private void AssetTest()
-        {
-            //Create and save a Test Profile
-            GestureProfile a = new GestureProfile("GestureTest");
-            MotionGesture b = new MotionGesture("MotionTest");
-            TriggerAction c = new TriggerAction("TriggerTest");
-            
-            SendableInputCombo d = new SendableInputCombo();
-
-            d.ComboInputs.Add(InputHelper.GetSendableInputByName("UP ARROW"));
-            d.ComboInputs.Add(InputHelper.GetSendableInputByName("RIGHT ARROW"));
-
-            c.InputCombos.Add(d);
-
-            SendableInputCombo e = new SendableInputCombo();
-
-            e.ComboInputs.Add(InputHelper.GetSendableInputByName("MOUSE LEFT CLICK"));
-            e.ComboInputs.Add(InputHelper.GetSendableInputByName("BACKSPACE"));
-
-            c.InputCombos.Add(e);
-
-            TriggerCondition f = new TriggerCondition(TriggerConditionType.Shake_Vertical);
-
-            f.ShakeEvent.Trigger_For_Objects = new List<TrackedObject>();
-            f.ShakeEvent.Trigger_For_Objects.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Left Hand")));
-            f.ShakeEvent.Trigger_When = new ChangeAmount();
-
-            TriggerCondition g = new TriggerCondition(TriggerConditionType.Proximity);
-            g.ProximityEvent.Device_Group_A.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Head")));
-            g.ProximityEvent.Device_Group_B.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Right Hand")));
-            //g.ProximityEvent.Invert = true;
-            g.ProximityEvent.Trigger_When = new ChangeAmount();
-
-            //f.Disable_If_Trigger_Conditions.Add(g);
-
-            b.TriggerConditions.Add(f);
-            b.TriggerConditions.Add(g);
-
-            b.TriggerOnAnyCondition = true;
-
-            AddTriggerAction(c);
-
-            b.TriggerActions.Add(c);
-            AddMotionGesture(b);
-
-            a.Gestures.Add(b);
-            AddGestureProfile(a);
-
-            SaveAssets();
-
-            ActiveGestureProfile = a;
-        }
-
+        #region BACKEND_CORE
         private void SetupOutputModules(string modules)
         {
             string[] moduleNames = modules.Split(',');
@@ -393,6 +353,11 @@ namespace XeRxKEYs
 
             LoadGestureProfiles();
 
+            DeDuplicateAssets();
+        }
+
+        private void DeDuplicateAssets()
+        {
             foreach (MotionGesture motion in allMotionGestures)
             {
                 for (int i = 0; i < motion.TriggerActions.Count; i++)
@@ -515,31 +480,61 @@ namespace XeRxKEYs
             }
 
             _keySenderTimer?.Dispose();
+
+            _cooldownTimer?.Dispose();
         }
 
         private void TimerCallback(object state)
         {
-            IntPtr myOwnHandle = IntPtr.Zero;
-            this.Invoke((MethodInvoker)delegate
+            try
             {
-                myOwnHandle = this.Handle;
-            });
+                IntPtr myOwnHandle = IntPtr.Zero;
+                this.Invoke((MethodInvoker)delegate
+                {
+                    myOwnHandle = this.Handle;
+                });
 
-            if (chkSendInputs.Checked)
+                if (chkSendInputs.Checked)
+                {
+                    SendKeysToForegroundWindow(myOwnHandle);
+                }
+            }
+            catch (Exception er)
             {
-                SendKeysToForegroundWindow(myOwnHandle);
+
             }
         }
 
         private void CooldownCallback(object state)
         {
-            this.Invoke((MethodInvoker)delegate
+            try
             {
-                foreach (MotionGesture gesture in allMotionGestures)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    gesture.UpdateCooldown(cooldownTimeMS);
-                }
-            });
+                    if (ActiveGestureProfile != null)
+                    {
+                        if (ActiveGestureProfile.Gestures.Count > 0)
+                        {
+                            foreach (MotionGesture gesture in ActiveGestureProfile.Gestures)
+                            {
+                                gesture.UpdateCooldown(cooldownTimeMS);
+
+                                if (gesture.TriggerActions.Count > 0)
+                                {
+                                    foreach (TriggerAction act in gesture.TriggerActions)
+                                    {
+                                        act.UpdateWaitTimer(cooldownTimeMS);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            catch (Exception er)
+            {
+
+            }
         }
 
         private void ShowWindow()
@@ -574,5 +569,379 @@ namespace XeRxKEYs
         {
 
         }
+
+        #endregion BACKEND_CORE
+
+        #region TESTS
+        private void AssetTest()
+        {
+            //Create and save a Test Profile
+            GestureProfile a = new GestureProfile("GestureTest");
+            MotionGesture b = new MotionGesture("MotionTest");
+            TriggerAction c = new TriggerAction("TriggerTest");
+
+            SendableInputCombo d = new SendableInputCombo();
+
+            d.ComboInputs.Add(InputHelper.GetSendableInputByName("UP ARROW"));
+            d.ComboInputs.Add(InputHelper.GetSendableInputByName("RIGHT ARROW"));
+
+            c.InputCombos.Add(d);
+
+            SendableInputCombo e = new SendableInputCombo();
+
+            e.ComboInputs.Add(InputHelper.GetSendableInputByName("MOUSE LEFT CLICK"));
+            e.ComboInputs.Add(InputHelper.GetSendableInputByName("BACKSPACE"));
+
+            c.InputCombos.Add(e);
+
+            TriggerCondition f = new TriggerCondition(TriggerConditionType.Shake_Vertical);
+
+            f.ShakeEvent.Trigger_For_Objects = new List<TrackedObject>();
+            f.ShakeEvent.Trigger_For_Objects.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Left Hand")));
+            f.ShakeEvent.Trigger_When = new ChangeAmount();
+
+            TriggerCondition g = new TriggerCondition(TriggerConditionType.Proximity);
+            g.ProximityEvent.Device_Group_A.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Head")));
+            g.ProximityEvent.Device_Group_B.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Right Hand")));
+            //g.ProximityEvent.Invert = true;
+            g.ProximityEvent.Trigger_When = new ChangeAmount();
+
+            //f.Disable_If_Trigger_Conditions.Add(g);
+
+            b.TriggerConditions.Add(f);
+            b.TriggerConditions.Add(g);
+
+            b.TriggerOnAnyCondition = true;
+
+            AddTriggerAction(c);
+
+            b.TriggerActions.Add(c);
+            AddMotionGesture(b);
+
+            a.Gestures.Add(b);
+            AddGestureProfile(a);
+
+            SaveAssets();
+
+            ActiveGestureProfile = a;
+        }
+
+        private void btnInputSelectPopupTest_Click(object sender, EventArgs e)
+        {
+            SelectInput inputSel = new SelectInput();
+
+            inputSel.SendInputTo(ReceiveInputTest);
+
+            inputSel.ShowDialog(this);
+
+            inputSel.Dispose();
+        }
+
+        public void ReceiveInputTest(SendableInput input)
+        {
+            if (input != null)
+            {
+                MessageBox.Show(input.Name + " SELECTED!");
+            }
+            else
+            {
+                MessageBox.Show("NO INPUT SELECTED!");
+            }
+        }
+
+        #endregion
+
+        #region PAGES_UI
+
+        private void SetTabPage(TabPage page, bool forceRefresh = false)
+        {
+            if (tcDisplayTabs.SelectedTab != page)
+            {
+                tcDisplayTabs.SelectedTab = page;
+            }
+
+            if (forceRefresh)
+            {
+                TriggerTabRefresh();
+            }
+        }
+
+        private void tcDisplayTabs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TriggerTabRefresh();
+        }
+
+        private void TriggerTabRefresh()
+        {
+            if (tcDisplayTabs.SelectedTab == tabSettings)
+            {
+                RefreshSettingsUI();
+            }
+            else if (tcDisplayTabs.SelectedTab == tabMain)
+            {
+                RefreshMainUI();
+            }
+            else if (tcDisplayTabs.SelectedTab == tabGestureProfiles)
+            {
+                RefreshProfilesUI();
+            }
+            else if (tcDisplayTabs.SelectedTab == tabMotionGestures)
+            {
+                RefreshGesturesUI();
+            }
+            else if (tcDisplayTabs.SelectedTab == tabEditTriggerActions)
+            {
+                RefreshActionsUI();
+            }
+            else if (tcDisplayTabs.SelectedTab == tabTriggerConditions)
+            {
+                RefreshConditionsUI();
+            }
+        }
+
+        #endregion
+
+        #region SETTINGS_UI
+        private void RefreshSettingsUI()
+        {
+            //cmbDefaultXRModule
+
+            //cmbDefaultGestureProfile
+
+            //clbDefaultOutModules
+
+        }
+
+        private void cmbDefaultXRModule_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmbDefaultGestureProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void clbDefaultOutModules_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabSettings_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnImportProfile_Click(object sender, EventArgs e)
+        {
+            oFDSelectFile.Title = "Select A Gesture Profile JSON File";
+            oFDSelectFile.FileName = "";
+            DialogResult foundIt = oFDSelectFile.ShowDialog(this);
+
+            if (foundIt == DialogResult.Cancel || oFDSelectFile.FileName == "")
+            {
+                MessageBox.Show(this, "Gesture Profile Not Found!", "XeRxKEYs - Unable To Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                if (File.Exists(oFDSelectFile.FileName))
+                {
+                    if (GestureLoadSave.LoadProfile(ref allGestureProfiles, ref xrModuleInstance, oFDSelectFile.FileName))
+                    {
+                        DeDuplicateAssets();
+
+                        MessageBox.Show(this, "Gesture Profile Imported!", "XeRxKEYs - Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        private void btnImportGesture_Click(object sender, EventArgs e)
+        {
+            oFDSelectFile.Title = "Select A Motion Gesture JSON File";
+            oFDSelectFile.FileName = "";
+            DialogResult foundIt = oFDSelectFile.ShowDialog(this);
+
+            if (foundIt == DialogResult.Cancel || oFDSelectFile.FileName == "")
+            {
+                MessageBox.Show(this, "Motion Gesture Not Found!", "XeRxKEYs - Unable To Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                if (File.Exists(oFDSelectFile.FileName))
+                {
+                    if (MotionLoadSave.LoadProfile(ref allMotionGestures, ref xrModuleInstance, oFDSelectFile.FileName))
+                    {
+                        DeDuplicateAssets();
+
+                        MessageBox.Show(this, "Motion Gesture Imported!", "XeRxKEYs - Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        private void btnImportAction_Click(object sender, EventArgs e)
+        {
+            oFDSelectFile.Title = "Select A Trigger Action JSON File";
+            oFDSelectFile.FileName = "";
+            DialogResult foundIt = oFDSelectFile.ShowDialog(this);
+
+            if (foundIt == DialogResult.Cancel || oFDSelectFile.FileName == "")
+            {
+                MessageBox.Show(this, "Trigger Action Not Found!", "XeRxKEYs - Unable To Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                if (File.Exists(oFDSelectFile.FileName))
+                {
+                    if (ActionLoadSave.LoadProfile(ref allTriggerActions, oFDSelectFile.FileName))
+                    {
+                        DeDuplicateAssets();
+
+                        MessageBox.Show(this, "Trigger Actions Imported!", "XeRxKEYs - Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        private void btnExportActions_Click(object sender, EventArgs e)
+        {
+            if (allTriggerActions.Count > 0)
+            {
+                fbdSelectFolder.Description = "Select A Folder To Export Trigger Actions To";
+                fbdSelectFolder.ShowDialog();
+
+                if (fbdSelectFolder.SelectedPath != null && fbdSelectFolder.SelectedPath != "" && Directory.Exists(fbdSelectFolder.SelectedPath))
+                {
+                    ActionLoadSave.SaveProfiles(allTriggerActions, fbdSelectFolder.SelectedPath);
+
+                    MessageBox.Show(this, "Trigger Actions Exported!", "XeRxKEYs - Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(this, "Folder not selected!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show(this, "No Trigger Actions To Export!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnExportGestures_Click(object sender, EventArgs e)
+        {
+            if (allMotionGestures.Count > 0)
+            {
+                fbdSelectFolder.Description = "Select A Folder To Export Motion Gestures To";
+                fbdSelectFolder.ShowDialog();
+
+                if (fbdSelectFolder.SelectedPath != null && fbdSelectFolder.SelectedPath != "" && Directory.Exists(fbdSelectFolder.SelectedPath))
+                {
+                    MotionLoadSave.SaveProfiles(allMotionGestures, fbdSelectFolder.SelectedPath);
+
+                    MessageBox.Show(this, "Motion Gestures Exported!", "XeRxKEYs - Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(this, "Folder not selected!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show(this, "No Motion Gestures To Export!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnExportProfiles_Click(object sender, EventArgs e)
+        {
+            if (allGestureProfiles.Count > 0)
+            {
+                fbdSelectFolder.Description = "Select A Folder To Export Gesture Profiles To";
+                fbdSelectFolder.ShowDialog();
+
+                if (fbdSelectFolder.SelectedPath != null && fbdSelectFolder.SelectedPath != "" && Directory.Exists(fbdSelectFolder.SelectedPath))
+                {
+                    GestureLoadSave.SaveProfiles(allGestureProfiles, fbdSelectFolder.SelectedPath);
+
+                    MessageBox.Show(this, "Gesture Profiles Exported!", "XeRxKEYs - Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(this, "Folder not selected!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show(this, "No Gesture Profiles To Export!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        private void btnSettingsSave_Click(object sender, EventArgs e)
+        {
+            var settings = Properties.Settings.Default;
+
+            settings.Save();
+
+            SetTabPage(tabMain);
+        }
+        #endregion
+
+        #region MAIN_UI
+        private void RefreshMainUI(bool skipGestureLoad = false)
+        {
+            var settings = Properties.Settings.Default;
+
+            if (!skipGestureLoad)
+            {
+                string gestureProfile = settings.GestureProfile;
+
+                if (gestureProfile != "")
+                {
+                    foreach (GestureProfile profile in allGestureProfiles)
+                    {
+                        if (profile.Name == gestureProfile)
+                        {
+                            ActiveGestureProfile = profile;
+                        }
+                    }
+                }
+            }
+
+            //TODO: Load values into the main UI
+
+        }
+
+        private void cmbActiveGestureProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //TODO: Switching active gesture profile by index
+        }
+        #endregion
+
+        #region PROFILES_UI
+        private void RefreshProfilesUI()
+        {
+            //TODO: Load values into the Gesture Profiles UI
+        }
+        #endregion
+
+        #region GESTURES_UI
+        private void RefreshGesturesUI()
+        {
+            //TODO: Load values into the Motion Gestures UI
+        }
+        #endregion
+
+        #region ACTIONS_UI
+        private void RefreshActionsUI()
+        {
+            //TODO: Load values into the Trigger Actions UI
+        }
+        #endregion
+
+        #region CONDITIONS_UI
+        private void RefreshConditionsUI()
+        {
+            //TODO: Load values into the Trigger Conditions UI
+        }
+        #endregion
     }
 }

@@ -11,16 +11,19 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
     [JsonObject(MemberSerialization.OptOut)]
     public class TriggerAction
     {
+        public SerializableJSONDataType Type = SerializableJSONDataType.TRIGGERACTION;
         public string Name { get; set; }
 
         public string Description { get; set; }
 
-        public float WaitTime { get; set; }
+        public float WaitTime { get; set; } //TODO: Use this to add delay between key combo sends
 
         public List<SerializableSendableCombo> SerializableInputCombos { get; set; }
 
         [JsonIgnore]
         public List<SendableInputCombo> InputCombos { get; set; }
+
+        private float waitTimer = 0f;
 
         public TriggerAction(string _name, string _desc = "", float _wait = 0.0f)
         {
@@ -30,6 +33,8 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
 
             SerializableInputCombos = new List<SerializableSendableCombo>();
             InputCombos = new List<SendableInputCombo>();
+
+            waitTimer = 0f;
         }
 
         public void PrepareSendableInputs()
@@ -64,6 +69,18 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
             {
                 SerializableInputCombos.Add(SendableInputCombo.ToSerializable(combo));
             }
+        }
+
+        public void UpdateWaitTimer(float msPassed)
+        {
+            waitTimer -= msPassed / 1000;
+
+            if (waitTimer <= 0) waitTimer = 0;
+        }
+
+        public void ClearWaitTimer()
+        {
+            waitTimer = 0f;
         }
     }
 }

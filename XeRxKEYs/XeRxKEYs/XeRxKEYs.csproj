@@ -105,6 +105,12 @@
     <Compile Include="OutputModules\SendKeysModule\SendKeys.cs" />
     <Compile Include="OutputModules\WXR\WinXROut.cs" />
     <Compile Include="OutputModules\WXR\XKeycode.cs" />
+    <Compile Include="SelectInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectInput.Designer.cs">
+      <DependentUpon>SelectInput.cs</DependentUpon>
+    </Compile>
     <Compile Include="TrackedObject.cs" />
     <Compile Include="WinApi.cs" />
     <Compile Include="Main.cs">
@@ -130,6 +136,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SelectInput.resx">
+      <DependentUpon>SelectInput.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

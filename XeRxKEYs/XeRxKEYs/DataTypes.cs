@@ -9,6 +9,7 @@ using WinApi;
 
 namespace XeRxKEYs
 {
+    //Core data types and helper classes
     public static class MathHelper
     {
         public const float DegToRad = (float)(Math.PI / 180.0);
@@ -412,6 +413,13 @@ namespace XeRxKEYs
 
             return new Quaternion(newX, newY, newZ, newW);
         }
+    }
+
+    public enum SerializableJSONDataType
+    {
+        GESTUREPROFILE,
+        MOTIONGESTURE,
+        TRIGGERACTION
     }
 
     //Sendable input mappings

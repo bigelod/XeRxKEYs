@@ -1,9 +1,11 @@
 {
+  "Type": 0,
   "Name": "GestureTest",
   "Image": "",
   "Description": "",
   "Gestures": [
     {
+      "Type": 1,
       "Name": "MotionTest",
       "Image": "",
       "Description": "",
@@ -58,6 +60,7 @@
       ],
       "TriggerActions": [
         {
+          "Type": 2,
           "Name": "TriggerTest",
           "Description": "",
           "WaitTime": 0.0,

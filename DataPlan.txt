@@ -112,3 +112,55 @@ Key::
 
 #Future key sending module ideas
 -> Finish SendInput / get it working on Windows for SteamVR users
+
+
+===============================================
+=== ================= =============== =========
+===============================================
+UI NOTES:
+===============================================
+========= ================ ================ ===
+===============================================
+Gesture Profile:
+Name
+Image
+Description
+Motion Gestures
+
+Motion Gesture:
+Name
+Image
+Description
+Sensitivity (FLOAT) *NOT AT ALPHA*
+Cooldown (FLOAT)
+Trigger Conditions
+Trigger Actions
+Trigger On Any Condition TRUE? (BOOL)
+
+Trigger Action:
+Name
+Description
+WaitTime (FLOAT) *NOT AT ALPHA*
+Input Combos
+	Open pop-up input select window
+
+Trigger Condition:
+Trigger Type (Shake Vertical, Stab, Twist, Slash, Swipe, Proximity)
+	Require Trigger Condition(s): *NOT AT ALPHA*
+		Open pop-up trigger editor without sub-triggers
+	Disable If Trigger Condition(s): *NOT AT ALPHA*
+		Open pop-up trigger editor without sub-triggers
+	Shake Event:
+		List of Trigger Objects
+		Min Shake Amount (FLOAT) *NOT AT ALPHA*
+		Max Shake Amount (FLOAT) *NOT AT ALPHA*
+		Shake Duration (FLOAT) *NOT AT ALPHA*
+		Shake Sensitivity Scalar (1.0) (FLOAT) *NOT AT ALPHA*
+	Proximity Event:
+		List of Trigger Objects A
+		List of Trigger Objects B
+		Min Distance (0.0) (FLOAT)
+		Max Distance (1.0) (FLOAT)
+		Duration of Proximity  *NOT AT ALPHA*
+		Invert Trigger (BOOL)
+		Trigger Once While True (BOOL)
