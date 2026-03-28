@@ -36,7 +36,7 @@ namespace XeRxKEYs.Gestures.GestureProfiles
             }
         }
 
-        public static void LoadProfiles(ref List<GestureProfile> gestureProfiles)
+        public static void LoadProfiles(ref List<GestureProfile> gestureProfiles, ref IXRModule xrModuleInstance)
         {
             gestureProfiles = new List<GestureProfile>();
 
@@ -58,7 +58,7 @@ namespace XeRxKEYs.Gestures.GestureProfiles
                     GestureProfile profile = JsonConvert.DeserializeObject<GestureProfile>(jsonString);
                     if (profile != null)
                     {
-                        profile.OnLoad();
+                        profile.OnLoad(ref xrModuleInstance);
                         gestureProfiles.Add(profile);
                     }
                 }

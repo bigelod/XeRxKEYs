@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,8 +40,13 @@ namespace XeRxKEYs.Gestures.MotionGestures
             TriggerOnAnyCondition = _triggerAny;
         }
 
-        public void OnLoad()
+        public void OnLoad(ref IXRModule xrModuleInstance)
         {
+            foreach (TriggerCondition condition in TriggerConditions)
+            {
+                condition.OnLoad(ref xrModuleInstance);
+            }
+
             foreach (TriggerAction action in TriggerActions)
             {
                 action.PrepareSendableInputs();
@@ -49,6 +55,11 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
         public void OnSave()
         {
+            foreach (TriggerCondition condition in TriggerConditions)
+            {
+                condition.OnSave();
+            }
+
             foreach (TriggerAction action in TriggerActions)
             {
                 action.PrepareSerializableCombos();
@@ -81,9 +92,13 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
             foreach (TriggerCondition condition in TriggerConditions)
             {
-                if (!condition.CheckTrigger())
+                if (condition.CheckTrigger())
                 {
                     anyFound = true;
+                    if (TriggerOnAnyCondition) return true;
+                }
+                else
+                {
                     if (!TriggerOnAnyCondition) return false;
                 }
             }

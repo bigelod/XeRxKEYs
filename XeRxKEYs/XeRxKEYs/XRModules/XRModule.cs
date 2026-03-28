@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XeRxKEYs
 {
-    interface IXRModule
+    public interface IXRModule
     {
         string DisplayName { get; set; }
         TrackedObject Head { get; set; }
@@ -19,5 +19,7 @@ namespace XeRxKEYs
         void SendCommand(string cmd);
         string RequestData(string request);
         void TriggersComplete();
+
+        TrackedObject GetTrackedObject(SerializableTrackedObject serializedTrackedObj);
     }
 }

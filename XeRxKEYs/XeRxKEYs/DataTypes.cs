@@ -548,4 +548,24 @@ namespace XeRxKEYs
             ComboInputs = new List<string>();
         }
     }
+
+    public class SerializableTrackedObject
+    {
+        public string TrackedObjectName { get; set; }
+
+        public SerializableTrackedObject()
+        {
+            TrackedObjectName = "NULL";
+        }
+
+        public SerializableTrackedObject(TrackedObject obj)
+        {
+            TrackedObjectName = obj.Name;
+        }
+
+        public SerializableTrackedObject(string name)
+        {
+            TrackedObjectName = name;
+        }
+    }
 }

@@ -43,6 +43,7 @@ namespace XeRxKEYs
         private float timeSinceLastTwistChange;
         private float slashCooldown;
 
+        //TODO: Feed these settings in from above, since TrackedObject data isn't stored to disk
         //Shake tweakable settings
         //This is when you shake the controller or your head physically up/down, it is position based
         private const float SHAKE_ACCELERATION_THRESHOLD = 5.0f;

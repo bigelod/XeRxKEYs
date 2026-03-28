@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XeRxKEYs
 {
-    interface IOutModule
+    public interface IOutModule
     {
         string DisplayName { get; set; }
 

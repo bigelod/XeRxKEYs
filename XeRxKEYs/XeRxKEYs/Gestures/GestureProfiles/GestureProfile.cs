@@ -22,11 +22,11 @@ namespace XeRxKEYs.Gestures.GestureProfiles
             Gestures = new List<MotionGesture>();
         }
 
-        public void OnLoad()
+        public void OnLoad(ref IXRModule xrModuleInstance)
         {
             foreach (MotionGesture gesture in Gestures)
             {
-                gesture.OnLoad();
+                gesture.OnLoad(ref xrModuleInstance);
             }
         }
 

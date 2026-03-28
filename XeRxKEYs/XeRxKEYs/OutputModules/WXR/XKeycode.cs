@@ -16,7 +16,7 @@ namespace XeRxKEYs.OutputModules.WXR
 
             foreach (string removable in UnsupportedKeys)
             {
-                ans += ans.Replace(removable, "");
+                ans = ans.Replace(removable, "");
             }
 
             return ans;
@@ -726,6 +726,8 @@ namespace XeRxKEYs.OutputModules.WXR
 
             foreach (string inKey in inKeys)
             {
+                if (ans != "K,") ans += ",";
+
                 ans += AddKey(inKey);
             }
 

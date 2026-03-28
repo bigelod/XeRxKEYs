@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -195,7 +196,7 @@ namespace XeRxKEYs.XRModules.WXR
 
             xrUDP = new WinXrUDP(ReceiveData);
 
-            xrUDP.SendHapticVibration(0.0f, 0.0f);
+            xrUDP.SendHapticVibration(0.0f, 0.0f); //Initialize the tracking
         }
 
         public void Shutdown()
@@ -215,7 +216,7 @@ namespace XeRxKEYs.XRModules.WXR
         {
             string ans = "";
 
-            //TODO: Consider ways to read input values from controllers beyond Vector3 Position and Quaternion Rotation?
+            //TODO: Consider ways to read input values from controllers beyond Vector3 Position and Quaternion Rotation? eg: button inputs
 
             return ans;
         }
@@ -325,8 +326,6 @@ namespace XeRxKEYs.XRModules.WXR
                 Vector3 newRHandPos = new Vector3();
                 Quaternion newRHandRot = new Quaternion();
 
-                //TODO: Parse the data above into the TrackedObjects
-
                 Head.Update(newHeadPos, newHeadRot, deltaTime);
                 L_Hand.Update(newLHandPos, newLHandRot, deltaTime);
                 R_Hand.Update(newRHandPos, newRHandRot, deltaTime);
@@ -340,6 +339,30 @@ namespace XeRxKEYs.XRModules.WXR
             Head.ClearTriggers();
             L_Hand.ClearTriggers();
             R_Hand.ClearTriggers();
+        }
+
+        public TrackedObject GetTrackedObject(SerializableTrackedObject serializedTrackedObj)
+        {
+            TrackedObject ans = null;
+
+            string shortName = serializedTrackedObj.TrackedObjectName.ToUpper().Substring(0, 1);
+
+            if (shortName == "H")
+            {
+                return Head;
+            }
+
+            if (shortName == "L")
+            {
+                return L_Hand;
+            }
+
+            if (shortName == "R")
+            {
+                return R_Hand;
+            }
+
+            return ans;
         }
 
         private void UpdateValue(ref float currValue, float newValue)

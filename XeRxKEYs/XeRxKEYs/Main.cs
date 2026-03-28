@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using WinApi;
 using XeRxKEYs.Gestures.GestureProfiles;
 using XeRxKEYs.Gestures.MotionGestures;
+using XeRxKEYs.Gestures.Triggers;
 using XeRxKEYs.Gestures.Triggers.Actions;
 
 namespace XeRxKEYs
@@ -156,10 +157,10 @@ namespace XeRxKEYs
         private void AssetTest()
         {
             //Create and save a Test Profile
-            TriggerAction c = new TriggerAction("TriggerTest");
-            MotionGesture b = new MotionGesture("MotionTest");
             GestureProfile a = new GestureProfile("GestureTest");
-
+            MotionGesture b = new MotionGesture("MotionTest");
+            TriggerAction c = new TriggerAction("TriggerTest");
+            
             SendableInputCombo d = new SendableInputCombo();
 
             d.ComboInputs.Add(InputHelper.GetSendableInputByName("UP ARROW"));
@@ -167,12 +168,31 @@ namespace XeRxKEYs
 
             c.InputCombos.Add(d);
 
-            SendableInputCombo f = new SendableInputCombo();
+            SendableInputCombo e = new SendableInputCombo();
 
-            f.ComboInputs.Add(InputHelper.GetSendableInputByName("MOUSE LEFT CLICK"));
-            f.ComboInputs.Add(InputHelper.GetSendableInputByName("BACKSPACE"));
+            e.ComboInputs.Add(InputHelper.GetSendableInputByName("MOUSE LEFT CLICK"));
+            e.ComboInputs.Add(InputHelper.GetSendableInputByName("BACKSPACE"));
 
-            c.InputCombos.Add(f);
+            c.InputCombos.Add(e);
+
+            TriggerCondition f = new TriggerCondition(TriggerConditionType.Shake_Vertical);
+
+            f.ShakeEvent.Trigger_For_Objects = new List<TrackedObject>();
+            f.ShakeEvent.Trigger_For_Objects.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Left Hand")));
+            f.ShakeEvent.Trigger_When = new ChangeAmount();
+
+            TriggerCondition g = new TriggerCondition(TriggerConditionType.Proximity);
+            g.ProximityEvent.Device_Group_A.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Head")));
+            g.ProximityEvent.Device_Group_B.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Right Hand")));
+            //g.ProximityEvent.Invert = true;
+            g.ProximityEvent.Trigger_When = new ChangeAmount();
+
+            //f.Disable_If_Trigger_Conditions.Add(g);
+
+            b.TriggerConditions.Add(f);
+            b.TriggerConditions.Add(g);
+
+            b.TriggerOnAnyCondition = true;
 
             AddTriggerAction(c);
 
@@ -183,6 +203,8 @@ namespace XeRxKEYs
             AddGestureProfile(a);
 
             SaveAssets();
+
+            ActiveGestureProfile = a;
         }
 
         private void SetupOutputModules(string modules)
@@ -437,12 +459,12 @@ namespace XeRxKEYs
 
         private void LoadMotionGestures()
         {
-            MotionLoadSave.LoadProfiles(ref allMotionGestures);
+            MotionLoadSave.LoadProfiles(ref allMotionGestures, ref xrModuleInstance);
         }
 
         private void LoadGestureProfiles()
         {
-            GestureLoadSave.LoadProfiles(ref allGestureProfiles);
+            GestureLoadSave.LoadProfiles(ref allGestureProfiles, ref xrModuleInstance);
         }
 
         private void SaveTriggerActions()
