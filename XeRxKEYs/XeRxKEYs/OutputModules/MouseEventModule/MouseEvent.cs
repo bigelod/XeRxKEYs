@@ -14,7 +14,17 @@ namespace XeRxKEYs.OutputModules.MouseEvent
     //Works in WinlatorXR testing, but unused due to alternative method (InputAPI)
     public class MouseEvent : IOutModule
     {
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return "MouseEvent";
+            }
+            set
+            {
+
+            }
+        }
 
         public void Setup()
         {

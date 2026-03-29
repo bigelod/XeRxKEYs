@@ -13,7 +13,17 @@ namespace XeRxKEYs.OutputModules.WXRModule
 {
     public class WinXROut : IOutModule
     {
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return "WinXROut";
+            }
+            set
+            {
+
+            }
+        }
 
         private int udpPortOUT = 7728;
         private int udpPortIN = 7287;

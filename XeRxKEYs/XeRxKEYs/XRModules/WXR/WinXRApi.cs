@@ -12,7 +12,18 @@ namespace XeRxKEYs.XRModules.WXR
 {
     public class WinXRApi : IXRModule
     {
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return "WinXRApi";
+            }
+            set
+            {
+
+            }
+        }
+
         public TrackedObject Head { get; set; }
         public TrackedObject L_Hand { get; set; }
         public TrackedObject R_Hand { get; set; }
@@ -84,7 +95,6 @@ namespace XeRxKEYs.XRModules.WXR
 
         public WinXRApi()
         {
-            DisplayName = "WinlatorXR XrAPI";
             Head = new TrackedObject("Head");
             L_Hand = new TrackedObject("Left Hand");
             R_Hand = new TrackedObject("Right Hand");

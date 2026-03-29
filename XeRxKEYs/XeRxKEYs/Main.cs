@@ -36,15 +36,21 @@ namespace XeRxKEYs
         public GestureProfile ActiveGestureProfile = null;
         public List<SendableInput> ActiveSendables = new List<SendableInput>();
 
-        private IXRModule xrModuleInstance = null;
         private Type xrModuleType = typeof(IXRModule);
+        private List<Type> activeOutModuleTypes = new List<Type>();
+
+        private List<string> allXRModuleNames = new List<string>();
+        private List<string> allOutModuleNames = new List<string>();
+
+        private IXRModule xrModuleInstance = null;
 
         private List<IOutModule> activeOutModules = new List<IOutModule>();
-        private List<Type> activeOutModuleTypes = new List<Type>();
 
         private List<TriggerAction> allTriggerActions = new List<TriggerAction>();
         private List<MotionGesture> allMotionGestures = new List<MotionGesture>();
         private List<GestureProfile> allGestureProfiles = new List<GestureProfile>();
+
+        private Action TabLeaveAction;
 
         public Main()
         {
@@ -63,6 +69,9 @@ namespace XeRxKEYs
 
             _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
             _cooldownTimer = new System.Threading.Timer(CooldownCallback, null, cooldownTimeMS, cooldownTimeMS);
+
+            LoadAllXRModules();
+            LoadAllOutputModules();
 
             InputHelper.GenerateSendableInputs();
 
@@ -132,12 +141,23 @@ namespace XeRxKEYs
 
             if (gestureProfile != "")
             {
+                bool profileFound = false;
+
                 foreach (GestureProfile profile in allGestureProfiles)
                 {
                     if (profile.Name == gestureProfile)
                     {
+                        profileFound = true;
                         ActiveGestureProfile = profile;
+
+                        break;
                     }
+                }
+
+                if (!profileFound && settings.GestureProfile != "")
+                {
+                    settings.GestureProfile = "";
+                    settings.Save();
                 }
 
                 if (settings.MinimizeAtStart)
@@ -166,10 +186,33 @@ namespace XeRxKEYs
                 }
             }
 
-            RefreshMainUI(true);
+            RefreshMainUI();
         }
 
         #region BACKEND_CORE
+
+        private void LoadAllXRModules()
+        {
+            allXRModuleNames.Clear();
+
+            foreach (Type moduleType in Assembly.GetExecutingAssembly().GetTypes()
+                 .Where(moduleType => moduleType.GetInterfaces().Contains(typeof(IXRModule))))
+            {
+                allXRModuleNames.Add(moduleType.Name);
+            }
+        }
+
+        private void LoadAllOutputModules()
+        {
+            allOutModuleNames.Clear();
+
+            foreach (Type moduleType in Assembly.GetExecutingAssembly().GetTypes()
+                 .Where(moduleType => moduleType.GetInterfaces().Contains(typeof(IOutModule))))
+            {
+                allOutModuleNames.Add(moduleType.Name);
+            }
+        }
+
         private void SetupOutputModules(string modules)
         {
             string[] moduleNames = modules.Split(',');
@@ -662,12 +705,18 @@ namespace XeRxKEYs
 
             if (forceRefresh)
             {
+                if (TabLeaveAction != null) TabLeaveAction.Invoke();
+                TabLeaveAction = null;
+
                 TriggerTabRefresh();
             }
         }
 
         private void tcDisplayTabs_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (TabLeaveAction != null) TabLeaveAction.Invoke();
+            TabLeaveAction = null;
+
             TriggerTabRefresh();
         }
 
@@ -704,12 +753,118 @@ namespace XeRxKEYs
         #region SETTINGS_UI
         private void RefreshSettingsUI()
         {
-            //cmbDefaultXRModule
+            TabLeaveAction = TabLeaveSettingsUI;
 
-            //cmbDefaultGestureProfile
+            int index = 0;
+            int currIndex = -1;
 
-            //clbDefaultOutModules
+            cmbDefaultXRModule.Items.Clear();
 
+            foreach (string moduleName in allXRModuleNames)
+            {
+                cmbDefaultXRModule.Items.Add(moduleName);
+
+                if (moduleName == Properties.Settings.Default.XRModule)
+                {
+                    currIndex = index;
+                }
+
+                index += 1;
+            }
+
+            if (currIndex > -1)
+            {
+                cmbDefaultXRModule.SelectedIndex = currIndex;
+            }
+
+            cmbDefaultGestureProfile.Items.Clear();
+            cmbDefaultGestureProfile.Items.Add(" ");
+
+            index = 1;
+            currIndex = -1;
+
+            foreach (GestureProfile profile in allGestureProfiles)
+            {
+                cmbDefaultGestureProfile.Items.Add(profile.Name);
+
+                if (profile.Name == Properties.Settings.Default.GestureProfile)
+                {
+                    currIndex = index;
+                }
+
+                index += 1;
+            }
+
+            if (currIndex > -1)
+            {
+                cmbDefaultGestureProfile.SelectedIndex = currIndex;
+            }
+
+            clbDefaultOutModules.Items.Clear();
+
+            foreach (string moduleName in allOutModuleNames)
+            {
+                CheckState isChecked = CheckState.Unchecked;
+
+                foreach (IOutModule module in activeOutModules)
+                {
+                    if (module.DisplayName == moduleName)
+                    {
+                        isChecked = CheckState.Checked;
+                    }
+                }
+
+                clbDefaultOutModules.Items.Add(moduleName, isChecked);
+            }
+
+            chkMinimizeAtStart.Checked = Properties.Settings.Default.MinimizeAtStart;
+
+        }
+
+        private void btnSettingsSave_Click(object sender, EventArgs e)
+        {
+            var settings = Properties.Settings.Default;
+
+            settings.XRModule = cmbDefaultXRModule.Text;
+
+            if (cmbDefaultGestureProfile.SelectedIndex > 0)
+            {
+                settings.GestureProfile = cmbDefaultGestureProfile.Text;
+            }
+            else
+            {
+                settings.GestureProfile = "";
+            }
+
+            string outModules = "";
+
+            foreach (object item in clbDefaultOutModules.CheckedItems)
+            {
+                string itemName = item.ToString();
+
+                if (outModules != "") outModules += ",";
+
+                outModules += itemName;
+            }
+
+            if (outModules == "")
+            {
+                outModules = "WinXROut";
+            }
+
+            settings.OutModules = outModules;
+
+            settings.MinimizeAtStart = chkMinimizeAtStart.Checked;
+
+            settings.Save();
+
+            SetTabPage(tabMain);
+        }
+
+        private void TabLeaveSettingsUI()
+        {
+            //TODO: Consider if users will ever be able to leave a tab except by closing the app or saving?
+            //Settings may be the only screen that needs to worry about this
         }
 
         private void cmbDefaultXRModule_SelectedIndexChanged(object sender, EventArgs e)
@@ -875,18 +1030,15 @@ namespace XeRxKEYs
                 MessageBox.Show(this, "No Gesture Profiles To Export!", "XeRxKEYs - Unable To Export", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        private void btnSettingsSave_Click(object sender, EventArgs e)
+
+        private void chkMinimizeAtStart_CheckedChanged(object sender, EventArgs e)
         {
-            var settings = Properties.Settings.Default;
 
-            settings.Save();
-
-            SetTabPage(tabMain);
         }
         #endregion
 
         #region MAIN_UI
-        private void RefreshMainUI(bool skipGestureLoad = false)
+        private void RefreshMainUI(bool skipGestureLoad = true)
         {
             var settings = Properties.Settings.Default;
 
@@ -906,13 +1058,71 @@ namespace XeRxKEYs
                 }
             }
 
+            cmbActiveGestureProfile.Items.Clear();
+
+            cmbActiveGestureProfile.Items.Add(" ");
+
+            int index = 1;
+            int currIndex = -1;
+
+            foreach (GestureProfile profile in allGestureProfiles)
+            {
+                cmbActiveGestureProfile.Items.Add(profile.Name);
+
+                if (ActiveGestureProfile != null && profile.Name == ActiveGestureProfile.Name)
+                {
+                    currIndex = index;
+                }
+
+                index += 1;
+            }
+
+            if (currIndex > -1)
+            {
+                cmbActiveGestureProfile.SelectedIndex = currIndex;
+            }
+
             //TODO: Load values into the main UI
 
         }
 
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            SetTabPage(tabSettings);
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
         private void cmbActiveGestureProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: Switching active gesture profile by index
+            if (cmbActiveGestureProfile.SelectedIndex <= 0)
+            {
+                ActiveGestureProfile = null;
+                txtActiveGestureProfileDesc.Text = "";
+
+                //TODO: Clear the image
+            }
+            else
+            {
+                foreach (GestureProfile profile in allGestureProfiles)
+                {
+                    if (profile.Name == cmbActiveGestureProfile.Text)
+                    {
+                        ActiveGestureProfile = profile;
+
+                        txtActiveGestureProfileDesc.Text = profile.Description;
+
+                        if (profile.Image != "")
+                        {
+                            //TODO: Load the image
+                        }
+                        break;
+                    }
+                }
+            }
         }
         #endregion
 

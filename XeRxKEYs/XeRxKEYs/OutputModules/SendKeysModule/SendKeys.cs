@@ -13,7 +13,17 @@ namespace XeRxKEYs.OutputModules.SendKeysModule
 {
     public class SendKeysModule : IOutModule
     {
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return "SendKeysModule";
+            }
+            set
+            {
+
+            }
+        }
 
         public void Setup()
         {

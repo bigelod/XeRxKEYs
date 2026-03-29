@@ -14,7 +14,17 @@ namespace XeRxKEYs.OutputModules.SendInputModule
     //Currently unfinished as it wasn't working as hoped
     public class SendInputModule : IOutModule
     {
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return "SendInputModule";
+            }
+            set
+            {
+
+            }
+        }
 
         public void Setup()
         {
