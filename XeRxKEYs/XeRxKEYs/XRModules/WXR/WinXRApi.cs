@@ -169,7 +169,7 @@ namespace XeRxKEYs.XRModules.WXR
                 {
                     using (StreamWriter sw = new StreamWriter(versionFile))
                     {
-                        sw.WriteLine("0.4");
+                        sw.WriteLine("0.5");
                     }
                 }
                 catch

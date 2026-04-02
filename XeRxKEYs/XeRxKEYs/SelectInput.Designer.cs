@@ -41,7 +41,7 @@
             this.lstSendableInputList.Location = new System.Drawing.Point(0, 0);
             this.lstSendableInputList.Name = "lstSendableInputList";
             this.lstSendableInputList.ScrollAlwaysVisible = true;
-            this.lstSendableInputList.Size = new System.Drawing.Size(327, 212);
+            this.lstSendableInputList.Size = new System.Drawing.Size(327, 264);
             this.lstSendableInputList.TabIndex = 0;
             this.lstSendableInputList.SelectedIndexChanged += new System.EventHandler(this.lstSendableInputList_SelectedIndexChanged);
             // 
@@ -49,9 +49,9 @@
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.Enabled = false;
-            this.btnSelect.Location = new System.Drawing.Point(240, 218);
+            this.btnSelect.Location = new System.Drawing.Point(240, 272);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(75, 38);
+            this.btnSelect.Size = new System.Drawing.Size(75, 24);
             this.btnSelect.TabIndex = 1;
             this.btnSelect.Text = "Select";
             this.btnSelect.UseVisualStyleBackColor = true;
@@ -60,9 +60,9 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(159, 218);
+            this.btnCancel.Location = new System.Drawing.Point(159, 272);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 38);
+            this.btnCancel.Size = new System.Drawing.Size(75, 24);
             this.btnCancel.TabIndex = 2;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -72,7 +72,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(327, 261);
+            this.ClientSize = new System.Drawing.Size(327, 301);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSelect);
             this.Controls.Add(this.lstSendableInputList);

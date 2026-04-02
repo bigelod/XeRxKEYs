@@ -61,6 +61,7 @@ namespace XeRxKEYs.OutputModules.WXRModule
                 return;
             }
 
+            //This may still be used in a future update, so keep it for now
             string inputVersionFile = dataDirectory + "/input_version";
 
             if (!File.Exists(inputVersionFile))
