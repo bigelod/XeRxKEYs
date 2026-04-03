@@ -75,6 +75,7 @@
             this.tabTriggerConditions = new System.Windows.Forms.TabPage();
             this.oFDSelectFile = new System.Windows.Forms.OpenFileDialog();
             this.fbdSelectFolder = new System.Windows.Forms.FolderBrowserDialog();
+            this.chkSaveAssetsOnClose = new System.Windows.Forms.CheckBox();
             this.cmsPopupMenu.SuspendLayout();
             this.tcDisplayTabs.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -242,6 +243,7 @@
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.chkSaveAssetsOnClose);
             this.tabSettings.Controls.Add(this.label12);
             this.tabSettings.Controls.Add(this.label11);
             this.tabSettings.Controls.Add(this.label10);
@@ -562,6 +564,22 @@
             // 
             this.fbdSelectFolder.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
+            // chkSaveAssetsOnClose
+            // 
+            this.chkSaveAssetsOnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkSaveAssetsOnClose.AutoSize = true;
+            this.chkSaveAssetsOnClose.Checked = true;
+            this.chkSaveAssetsOnClose.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSaveAssetsOnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkSaveAssetsOnClose.Location = new System.Drawing.Point(588, 70);
+            this.chkSaveAssetsOnClose.Name = "chkSaveAssetsOnClose";
+            this.chkSaveAssetsOnClose.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkSaveAssetsOnClose.Size = new System.Drawing.Size(155, 17);
+            this.chkSaveAssetsOnClose.TabIndex = 26;
+            this.chkSaveAssetsOnClose.Text = ":Save Assets On Close";
+            this.chkSaveAssetsOnClose.UseVisualStyleBackColor = true;
+            this.chkSaveAssetsOnClose.CheckedChanged += new System.EventHandler(this.chkSaveAssetsOnClose_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -630,6 +648,7 @@
         private System.Windows.Forms.PictureBox picActiveGestureProfile;
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.CheckBox chkSaveAssetsOnClose;
     }
 }
 

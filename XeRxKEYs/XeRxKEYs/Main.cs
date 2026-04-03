@@ -121,13 +121,13 @@ namespace XeRxKEYs
 
             if (!SetupInputModule(xrMod))
             {
-                MessageBox.Show(this, "Input module not found! Setting back to default", "XeRxKEYs - Error loading Input module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "XR module not found! Setting back to default", "XeRxKEYs - Error loading XR module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 settings.XRModule = "WinXRApi";
                 settings.Save();
 
                 if (!SetupInputModule("WinXRApi"))
                 {
-                    MessageBox.Show(this, "Catastrophic error! Closing!", "XeRxKEYs - Error loading Input module!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(this, "Catastrophic error! Closing!", "XeRxKEYs - Error loading XR module!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                 }
             }
@@ -512,6 +512,8 @@ namespace XeRxKEYs
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (Properties.Settings.Default.SaveOnClose) SaveAssets();
+
             foreach (IOutModule module in activeOutModules)
             {
                 module.Shutdown();
@@ -665,11 +667,11 @@ namespace XeRxKEYs
             AddMotionGesture(b);
 
             a.Gestures.Add(b);
-            AddGestureProfile(a);
-
-            SaveAssets();
 
             ActiveGestureProfile = a;
+            AddGestureProfile(ActiveGestureProfile);
+
+            SaveAssets();
         }
 
         private void btnInputSelectPopupTest_Click(object sender, EventArgs e)
@@ -822,6 +824,8 @@ namespace XeRxKEYs
 
             chkMinimizeAtStart.Checked = Properties.Settings.Default.MinimizeAtStart;
 
+            chkSaveAssetsOnClose.Checked = Properties.Settings.Default.SaveOnClose;
+
         }
 
         private void btnSettingsSave_Click(object sender, EventArgs e)
@@ -858,9 +862,48 @@ namespace XeRxKEYs
             settings.OutModules = outModules;
 
             settings.MinimizeAtStart = chkMinimizeAtStart.Checked;
+            settings.SaveOnClose = chkSaveAssetsOnClose.Checked;
 
             settings.Save();
 
+            if (cmbDefaultXRModule.Text != "" && xrModuleInstance != null && cmbDefaultXRModule.Text != xrModuleInstance.DisplayName)
+            {
+                if (!SetupInputModule(cmbDefaultXRModule.Text))
+                {
+                    xrModuleInstance.Shutdown();
+
+                    MessageBox.Show(this, "XR module not found! Setting back to default", "XeRxKEYs - Error loading XR module!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    settings.XRModule = "WinXRApi";
+                    settings.Save();
+
+                    if (!SetupInputModule("WinXRApi"))
+                    {
+                        MessageBox.Show(this, "Catastrophic error! Closing!", "XeRxKEYs - Error loading XR module!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Close();
+                    }
+                }
+            }
+
+            string currActiveOutModules = "";
+
+            foreach (IOutModule module in activeOutModules)
+            {
+                if (currActiveOutModules != "") currActiveOutModules += ",";
+
+                currActiveOutModules += module.DisplayName;
+            }
+
+            if (currActiveOutModules != outModules)
+            {
+                foreach (IOutModule module in activeOutModules)
+                {
+                    module.Shutdown();
+                }
+
+                activeOutModules.Clear();
+
+                SetupOutputModules(outModules);
+            }
             SetTabPage(tabMain);
         }
 
@@ -1035,6 +1078,11 @@ namespace XeRxKEYs
         }
 
         private void chkMinimizeAtStart_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkSaveAssetsOnClose_CheckedChanged(object sender, EventArgs e)
         {
 
         }

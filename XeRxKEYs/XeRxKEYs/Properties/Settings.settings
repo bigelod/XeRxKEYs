@@ -14,5 +14,8 @@
     <Setting Name="OutModules" Type="System.String" Scope="User">
       <Value Profile="(Default)">WinXROut</Value>
     </Setting>
+    <Setting Name="SaveOnClose" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -70,5 +70,17 @@ namespace XeRxKEYs.Properties {
                 this["OutModules"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveOnClose {
+            get {
+                return ((bool)(this["SaveOnClose"]));
+            }
+            set {
+                this["SaveOnClose"] = value;
+            }
+        }
     }
 }
