@@ -35,6 +35,57 @@ namespace XeRxKEYs.Gestures.GestureProfiles
 
                 if (string.IsNullOrWhiteSpace(profile.Name)) continue;
 
+                if (overridePath != "")
+                {
+                    //We are exporting images to this folder too
+
+                    if (profile.Image != "")
+                    {
+                        //Also export the images from library
+                        string imgPath = Path.Combine(exePath, "Images", profile.Image);
+                        string copyToDir = Path.Combine(profilesFolderPath, "Images");
+                        string copyToPath = imgPath.Replace(exePath, profilesFolderPath);
+
+                        if (!Directory.Exists(copyToDir))
+                        {
+                            Directory.CreateDirectory(copyToDir);
+                        }
+
+                        if (File.Exists(imgPath))
+                        {
+                            try
+                            {
+                                File.Copy(imgPath, copyToPath);
+                            }
+                            catch
+                            {
+
+                            }                            
+                        }
+                    }
+
+                    foreach (MotionGesture gesture in profile.Gestures)
+                    {
+                        //Export for sub-gestures too
+                        if (gesture.Image != "")
+                        {
+                            string imgPath = Path.Combine(exePath, "Images", gesture.Image);
+                            string copyToDir = Path.Combine(profilesFolderPath, "Images");
+                            string copyToPath = imgPath.Replace(exePath, profilesFolderPath);
+
+                            if (!Directory.Exists(copyToDir))
+                            {
+                                Directory.CreateDirectory(copyToDir);
+                            }
+
+                            if (File.Exists(imgPath))
+                            {
+                                File.Copy(imgPath, copyToPath);
+                            }
+                        }
+                    }
+                }
+
                 string filePath = Path.Combine(profilesFolderPath, profile.Name + ".json");
 
                 string jsonString = JsonConvert.SerializeObject(profile, options);
@@ -84,6 +135,30 @@ namespace XeRxKEYs.Gestures.GestureProfiles
         {
             if (File.Exists(newProfile))
             {
+                //Check for images and copy them if we don't have them already as well
+                string profileDir = Path.GetDirectoryName(newProfile);
+                string checkImgDir = Path.Combine(profileDir, "Images");
+                string libraryImgDir = Path.Combine(Application.StartupPath, "Images");
+
+                if (Directory.Exists(checkImgDir))
+                {
+                    IEnumerable<string> pngFiles = Directory.EnumerateFiles(checkImgDir, "*.png", SearchOption.TopDirectoryOnly);
+
+                    foreach (string currentFile in pngFiles)
+                    {
+                        string newFile = currentFile.Replace(checkImgDir, libraryImgDir);
+
+                        try
+                        {
+                            File.Copy(currentFile, newFile);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+
                 string jsonString = File.ReadAllText(newProfile);
                 try
                 {

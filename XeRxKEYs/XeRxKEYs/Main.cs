@@ -623,6 +623,9 @@ namespace XeRxKEYs
             MotionGesture b = new MotionGesture("MotionTest");
             TriggerAction c = new TriggerAction("TriggerTest");
 
+            a.Image = "Icon.1_01.png";
+            b.Image = "Icon.1_05.png";
+
             SendableInputCombo d = new SendableInputCombo();
 
             d.ComboInputs.Add(InputHelper.GetSendableInputByName("UP ARROW"));
@@ -1102,8 +1105,7 @@ namespace XeRxKEYs
             {
                 ActiveGestureProfile = null;
                 txtActiveGestureProfileDesc.Text = "";
-
-                //TODO: Clear the image
+                picActiveGestureProfile.Image = null;
             }
             else
             {
@@ -1117,7 +1119,9 @@ namespace XeRxKEYs
 
                         if (profile.Image != "")
                         {
-                            //TODO: Load the image
+                            string imagePath = Path.Combine(Application.StartupPath, "Images", profile.Image);
+
+                            picActiveGestureProfile.Image = Image.FromFile(imagePath);
                         }
                         break;
                     }

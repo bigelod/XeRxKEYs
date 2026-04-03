@@ -37,6 +37,8 @@
             this.chkSendInputs = new System.Windows.Forms.CheckBox();
             this.tcDisplayTabs = new System.Windows.Forms.TabControl();
             this.tabMain = new System.Windows.Forms.TabPage();
+            this.btnExit = new System.Windows.Forms.Button();
+            this.btnSettings = new System.Windows.Forms.Button();
             this.picActiveGestureProfile = new System.Windows.Forms.PictureBox();
             this.label14 = new System.Windows.Forms.Label();
             this.txtActiveGestureProfileDesc = new System.Windows.Forms.TextBox();
@@ -73,8 +75,6 @@
             this.tabTriggerConditions = new System.Windows.Forms.TabPage();
             this.oFDSelectFile = new System.Windows.Forms.OpenFileDialog();
             this.fbdSelectFolder = new System.Windows.Forms.FolderBrowserDialog();
-            this.btnSettings = new System.Windows.Forms.Button();
-            this.btnExit = new System.Windows.Forms.Button();
             this.cmsPopupMenu.SuspendLayout();
             this.tcDisplayTabs.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -162,11 +162,32 @@
             this.tabMain.Text = "Main";
             this.tabMain.UseVisualStyleBackColor = true;
             // 
+            // btnExit
+            // 
+            this.btnExit.Location = new System.Drawing.Point(644, 371);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(124, 32);
+            this.btnExit.TabIndex = 15;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Location = new System.Drawing.Point(644, 333);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(124, 32);
+            this.btnSettings.TabIndex = 14;
+            this.btnSettings.Text = "Settings";
+            this.btnSettings.UseVisualStyleBackColor = true;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
+            // 
             // picActiveGestureProfile
             // 
             this.picActiveGestureProfile.Location = new System.Drawing.Point(365, 6);
             this.picActiveGestureProfile.Name = "picActiveGestureProfile";
             this.picActiveGestureProfile.Size = new System.Drawing.Size(81, 77);
+            this.picActiveGestureProfile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picActiveGestureProfile.TabIndex = 13;
             this.picActiveGestureProfile.TabStop = false;
             // 
@@ -540,26 +561,6 @@
             // fbdSelectFolder
             // 
             this.fbdSelectFolder.RootFolder = System.Environment.SpecialFolder.MyComputer;
-            // 
-            // btnSettings
-            // 
-            this.btnSettings.Location = new System.Drawing.Point(644, 333);
-            this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(124, 32);
-            this.btnSettings.TabIndex = 14;
-            this.btnSettings.Text = "Settings";
-            this.btnSettings.UseVisualStyleBackColor = true;
-            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
-            // 
-            // btnExit
-            // 
-            this.btnExit.Location = new System.Drawing.Point(644, 371);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(124, 32);
-            this.btnExit.TabIndex = 15;
-            this.btnExit.Text = "Exit";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // Main
             // 

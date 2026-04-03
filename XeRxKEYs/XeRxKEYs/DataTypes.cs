@@ -478,7 +478,7 @@ namespace XeRxKEYs
                 default:
                     Name = "MOUSE LEFT CLICK";
                     MouseButtonDownFlag = WindowsAPI.MOUSEEVENTF_LEFTDOWN;
-                    MouseButtonUpFlag = WindowsAPI.MOUSEEVENTF_RIGHTUP;
+                    MouseButtonUpFlag = WindowsAPI.MOUSEEVENTF_LEFTUP;
                     break;
             }
         }
