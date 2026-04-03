@@ -46,6 +46,7 @@
             this.cmbActiveGestureProfile = new System.Windows.Forms.ComboBox();
             this.btnInputSelectPopupTest = new System.Windows.Forms.Button();
             this.tabSettings = new System.Windows.Forms.TabPage();
+            this.chkSaveAssetsOnClose = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -75,7 +76,7 @@
             this.tabTriggerConditions = new System.Windows.Forms.TabPage();
             this.oFDSelectFile = new System.Windows.Forms.OpenFileDialog();
             this.fbdSelectFolder = new System.Windows.Forms.FolderBrowserDialog();
-            this.chkSaveAssetsOnClose = new System.Windows.Forms.CheckBox();
+            this.btnIconSelectPopup = new System.Windows.Forms.Button();
             this.cmsPopupMenu.SuspendLayout();
             this.tcDisplayTabs.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -146,6 +147,7 @@
             // 
             // tabMain
             // 
+            this.tabMain.Controls.Add(this.btnIconSelectPopup);
             this.tabMain.Controls.Add(this.btnExit);
             this.tabMain.Controls.Add(this.btnSettings);
             this.tabMain.Controls.Add(this.picActiveGestureProfile);
@@ -275,6 +277,22 @@
             this.tabSettings.Text = "Settings";
             this.tabSettings.UseVisualStyleBackColor = true;
             this.tabSettings.Click += new System.EventHandler(this.tabSettings_Click);
+            // 
+            // chkSaveAssetsOnClose
+            // 
+            this.chkSaveAssetsOnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkSaveAssetsOnClose.AutoSize = true;
+            this.chkSaveAssetsOnClose.Checked = true;
+            this.chkSaveAssetsOnClose.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSaveAssetsOnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkSaveAssetsOnClose.Location = new System.Drawing.Point(588, 70);
+            this.chkSaveAssetsOnClose.Name = "chkSaveAssetsOnClose";
+            this.chkSaveAssetsOnClose.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkSaveAssetsOnClose.Size = new System.Drawing.Size(155, 17);
+            this.chkSaveAssetsOnClose.TabIndex = 26;
+            this.chkSaveAssetsOnClose.Text = ":Save Assets On Close";
+            this.chkSaveAssetsOnClose.UseVisualStyleBackColor = true;
+            this.chkSaveAssetsOnClose.CheckedChanged += new System.EventHandler(this.chkSaveAssetsOnClose_CheckedChanged);
             // 
             // label12
             // 
@@ -564,21 +582,15 @@
             // 
             this.fbdSelectFolder.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // chkSaveAssetsOnClose
+            // btnIconSelectPopup
             // 
-            this.chkSaveAssetsOnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkSaveAssetsOnClose.AutoSize = true;
-            this.chkSaveAssetsOnClose.Checked = true;
-            this.chkSaveAssetsOnClose.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveAssetsOnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkSaveAssetsOnClose.Location = new System.Drawing.Point(588, 70);
-            this.chkSaveAssetsOnClose.Name = "chkSaveAssetsOnClose";
-            this.chkSaveAssetsOnClose.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.chkSaveAssetsOnClose.Size = new System.Drawing.Size(155, 17);
-            this.chkSaveAssetsOnClose.TabIndex = 26;
-            this.chkSaveAssetsOnClose.Text = ":Save Assets On Close";
-            this.chkSaveAssetsOnClose.UseVisualStyleBackColor = true;
-            this.chkSaveAssetsOnClose.CheckedChanged += new System.EventHandler(this.chkSaveAssetsOnClose_CheckedChanged);
+            this.btnIconSelectPopup.Location = new System.Drawing.Point(616, 58);
+            this.btnIconSelectPopup.Name = "btnIconSelectPopup";
+            this.btnIconSelectPopup.Size = new System.Drawing.Size(152, 23);
+            this.btnIconSelectPopup.TabIndex = 16;
+            this.btnIconSelectPopup.Text = "IconSelectPopupTest";
+            this.btnIconSelectPopup.UseVisualStyleBackColor = true;
+            this.btnIconSelectPopup.Click += new System.EventHandler(this.btnIconSelectPopup_Click);
             // 
             // Main
             // 
@@ -649,6 +661,7 @@
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.CheckBox chkSaveAssetsOnClose;
+        private System.Windows.Forms.Button btnIconSelectPopup;
     }
 }
 

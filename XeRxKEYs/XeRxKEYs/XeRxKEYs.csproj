@@ -105,6 +105,12 @@
     <Compile Include="OutputModules\SendKeysModule\SendKeys.cs" />
     <Compile Include="OutputModules\WXR\WinXROut.cs" />
     <Compile Include="OutputModules\WXR\XKeycode.cs" />
+    <Compile Include="SelectImage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectImage.Designer.cs">
+      <DependentUpon>SelectImage.cs</DependentUpon>
+    </Compile>
     <Compile Include="SelectInput.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -136,6 +142,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SelectImage.resx">
+      <DependentUpon>SelectImage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelectInput.resx">
       <DependentUpon>SelectInput.cs</DependentUpon>
     </EmbeddedResource>

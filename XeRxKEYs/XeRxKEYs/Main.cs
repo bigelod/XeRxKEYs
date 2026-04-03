@@ -697,6 +697,24 @@ namespace XeRxKEYs
             }
         }
 
+        private void btnIconSelectPopup_Click(object sender, EventArgs e)
+        {
+            SelectImage imageSel = new SelectImage();
+
+            imageSel.SendIconTo(ReceiveIconName);
+
+            imageSel.ShowDialog(this);
+
+            imageSel.Dispose();
+        }
+
+        public void ReceiveIconName(string name)
+        {
+            if (name == "") name = "NONE";
+
+            MessageBox.Show(name);
+        }
+
         #endregion
 
         #region PAGES_UI
@@ -1205,5 +1223,7 @@ namespace XeRxKEYs
             //TODO: Load values into the Trigger Conditions UI
         }
         #endregion
+
+        
     }
 }
