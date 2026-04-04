@@ -37,6 +37,7 @@
             this.chkSendInputs = new System.Windows.Forms.CheckBox();
             this.tcDisplayTabs = new System.Windows.Forms.TabControl();
             this.tabMain = new System.Windows.Forms.TabPage();
+            this.btnIconSelectPopup = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnSettings = new System.Windows.Forms.Button();
             this.picActiveGestureProfile = new System.Windows.Forms.PictureBox();
@@ -76,7 +77,10 @@
             this.tabTriggerConditions = new System.Windows.Forms.TabPage();
             this.oFDSelectFile = new System.Windows.Forms.OpenFileDialog();
             this.fbdSelectFolder = new System.Windows.Forms.FolderBrowserDialog();
-            this.btnIconSelectPopup = new System.Windows.Forms.Button();
+            this.lvwActiveMotionGestures = new System.Windows.Forms.ListView();
+            this.label15 = new System.Windows.Forms.Label();
+            this.btnEditGestures = new System.Windows.Forms.Button();
+            this.btnEditMotionGestures = new System.Windows.Forms.Button();
             this.cmsPopupMenu.SuspendLayout();
             this.tcDisplayTabs.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -147,6 +151,10 @@
             // 
             // tabMain
             // 
+            this.tabMain.Controls.Add(this.btnEditMotionGestures);
+            this.tabMain.Controls.Add(this.btnEditGestures);
+            this.tabMain.Controls.Add(this.label15);
+            this.tabMain.Controls.Add(this.lvwActiveMotionGestures);
             this.tabMain.Controls.Add(this.btnIconSelectPopup);
             this.tabMain.Controls.Add(this.btnExit);
             this.tabMain.Controls.Add(this.btnSettings);
@@ -164,6 +172,17 @@
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "Main";
             this.tabMain.UseVisualStyleBackColor = true;
+            // 
+            // btnIconSelectPopup
+            // 
+            this.btnIconSelectPopup.Location = new System.Drawing.Point(616, 58);
+            this.btnIconSelectPopup.Name = "btnIconSelectPopup";
+            this.btnIconSelectPopup.Size = new System.Drawing.Size(152, 23);
+            this.btnIconSelectPopup.TabIndex = 16;
+            this.btnIconSelectPopup.Text = "IconSelectPopupTest";
+            this.btnIconSelectPopup.UseVisualStyleBackColor = true;
+            this.btnIconSelectPopup.Visible = false;
+            this.btnIconSelectPopup.Click += new System.EventHandler(this.btnIconSelectPopup_Click);
             // 
             // btnExit
             // 
@@ -189,7 +208,7 @@
             // 
             this.picActiveGestureProfile.Location = new System.Drawing.Point(365, 6);
             this.picActiveGestureProfile.Name = "picActiveGestureProfile";
-            this.picActiveGestureProfile.Size = new System.Drawing.Size(81, 77);
+            this.picActiveGestureProfile.Size = new System.Drawing.Size(78, 78);
             this.picActiveGestureProfile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picActiveGestureProfile.TabIndex = 13;
             this.picActiveGestureProfile.TabStop = false;
@@ -241,6 +260,7 @@
             this.btnInputSelectPopupTest.TabIndex = 2;
             this.btnInputSelectPopupTest.Text = "InputSelectPopupTest";
             this.btnInputSelectPopupTest.UseVisualStyleBackColor = true;
+            this.btnInputSelectPopupTest.Visible = false;
             this.btnInputSelectPopupTest.Click += new System.EventHandler(this.btnInputSelectPopupTest_Click);
             // 
             // tabSettings
@@ -582,15 +602,47 @@
             // 
             this.fbdSelectFolder.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // btnIconSelectPopup
+            // lvwActiveMotionGestures
             // 
-            this.btnIconSelectPopup.Location = new System.Drawing.Point(616, 58);
-            this.btnIconSelectPopup.Name = "btnIconSelectPopup";
-            this.btnIconSelectPopup.Size = new System.Drawing.Size(152, 23);
-            this.btnIconSelectPopup.TabIndex = 16;
-            this.btnIconSelectPopup.Text = "IconSelectPopupTest";
-            this.btnIconSelectPopup.UseVisualStyleBackColor = true;
-            this.btnIconSelectPopup.Click += new System.EventHandler(this.btnIconSelectPopup_Click);
+            this.lvwActiveMotionGestures.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lvwActiveMotionGestures.HideSelection = false;
+            this.lvwActiveMotionGestures.Location = new System.Drawing.Point(11, 102);
+            this.lvwActiveMotionGestures.MultiSelect = false;
+            this.lvwActiveMotionGestures.Name = "lvwActiveMotionGestures";
+            this.lvwActiveMotionGestures.Size = new System.Drawing.Size(348, 301);
+            this.lvwActiveMotionGestures.TabIndex = 17;
+            this.lvwActiveMotionGestures.UseCompatibleStateImageBehavior = false;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Location = new System.Drawing.Point(8, 86);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(143, 13);
+            this.label15.TabIndex = 18;
+            this.label15.Text = "Active Motion Gestures:";
+            // 
+            // btnEditGestures
+            // 
+            this.btnEditGestures.Location = new System.Drawing.Point(419, 130);
+            this.btnEditGestures.Name = "btnEditGestures";
+            this.btnEditGestures.Size = new System.Drawing.Size(124, 124);
+            this.btnEditGestures.TabIndex = 19;
+            this.btnEditGestures.Text = "Edit Gesture Profiles";
+            this.btnEditGestures.UseVisualStyleBackColor = true;
+            this.btnEditGestures.Click += new System.EventHandler(this.btnEditGestures_Click);
+            // 
+            // btnEditMotionGestures
+            // 
+            this.btnEditMotionGestures.Location = new System.Drawing.Point(587, 130);
+            this.btnEditMotionGestures.Name = "btnEditMotionGestures";
+            this.btnEditMotionGestures.Size = new System.Drawing.Size(124, 124);
+            this.btnEditMotionGestures.TabIndex = 20;
+            this.btnEditMotionGestures.Text = "Edit Motion Gestures";
+            this.btnEditMotionGestures.UseVisualStyleBackColor = true;
+            this.btnEditMotionGestures.Click += new System.EventHandler(this.btnEditMotionGestures_Click);
             // 
             // Main
             // 
@@ -662,6 +714,10 @@
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.CheckBox chkSaveAssetsOnClose;
         private System.Windows.Forms.Button btnIconSelectPopup;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.ListView lvwActiveMotionGestures;
+        private System.Windows.Forms.Button btnEditGestures;
+        private System.Windows.Forms.Button btnEditMotionGestures;
     }
 }
 

@@ -64,6 +64,7 @@
             this.lvwIcons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvwIcons.HideSelection = false;
             this.lvwIcons.Location = new System.Drawing.Point(0, 0);
+            this.lvwIcons.MultiSelect = false;
             this.lvwIcons.Name = "lvwIcons";
             this.lvwIcons.Size = new System.Drawing.Size(504, 312);
             this.lvwIcons.TabIndex = 3;

@@ -52,6 +52,8 @@ namespace XeRxKEYs
 
         private Action TabLeaveAction;
 
+        private bool StopImageLoads = false;
+
         public Main()
         {
             InitializeComponent();
@@ -162,6 +164,7 @@ namespace XeRxKEYs
 
                 if (settings.MinimizeAtStart)
                 {
+                    StopImageLoads = true;
                     this.WindowState = FormWindowState.Minimized;
                 }
             }
@@ -497,7 +500,12 @@ namespace XeRxKEYs
         {
             if (WindowState == FormWindowState.Minimized)
             {
+                StopImageLoads = true;
                 Hide();
+            }
+            else
+            {
+                StopImageLoads = false;
             }
         }
 
@@ -588,10 +596,15 @@ namespace XeRxKEYs
 
             if (this.WindowState == FormWindowState.Minimized)
             {
+                StopImageLoads = false;
                 this.WindowState = FormWindowState.Normal;
             }
 
+            TriggerTabRefresh();
+
             BringToFront();
+            this.TopMost = true;
+            this.TopMost = false;
             Focus();
         }
 
@@ -627,6 +640,9 @@ namespace XeRxKEYs
 
             a.Image = "Icon.1_01.png";
             b.Image = "Icon.1_05.png";
+
+            a.Description = "Gesture Profile Test";
+            b.Description = "Motion Gesture Test";
 
             SendableInputCombo d = new SendableInputCombo();
 
@@ -1107,52 +1123,39 @@ namespace XeRxKEYs
         #endregion
 
         #region MAIN_UI
-        private void RefreshMainUI(bool skipGestureLoad = true)
+        private void RefreshMainUI()
         {
-            var settings = Properties.Settings.Default;
-
-            if (!skipGestureLoad)
-            {
-                string gestureProfile = settings.GestureProfile;
-
-                if (gestureProfile != "")
-                {
-                    foreach (GestureProfile profile in allGestureProfiles)
-                    {
-                        if (profile.Name == gestureProfile)
-                        {
-                            ActiveGestureProfile = profile;
-                        }
-                    }
-                }
-            }
-
             cmbActiveGestureProfile.Items.Clear();
 
             cmbActiveGestureProfile.Items.Add(" ");
 
-            int index = 1;
-            int currIndex = -1;
-
             foreach (GestureProfile profile in allGestureProfiles)
             {
                 cmbActiveGestureProfile.Items.Add(profile.Name);
+            }
 
-                if (ActiveGestureProfile != null && profile.Name == ActiveGestureProfile.Name)
+            if (ActiveGestureProfile != null)
+            {
+                bool profileFound = false;
+                int index = 0;
+
+                foreach (GestureProfile profile in allGestureProfiles)
                 {
-                    currIndex = index;
+                    if (profile.Name == ActiveGestureProfile.Name)
+                    {
+                        cmbActiveGestureProfile.SelectedIndex = index + 1;
+                        profileFound = true;
+                        break;
+                    }
+
+                    index += 1;
                 }
 
-                index += 1;
+                if (!profileFound)
+                {
+                    cmbActiveGestureProfile.SelectedIndex = 0;
+                }
             }
-
-            if (currIndex > -1)
-            {
-                cmbActiveGestureProfile.SelectedIndex = currIndex;
-            }
-
-            //TODO: Load values into the main UI
-
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -1167,6 +1170,14 @@ namespace XeRxKEYs
 
         private void cmbActiveGestureProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            UpdateActiveGestureProfile();
+        }
+
+        private void UpdateActiveGestureProfile()
+        {
+            lvwActiveMotionGestures.Items.Clear();
+            lvwActiveMotionGestures.SmallImageList = null;
+
             if (cmbActiveGestureProfile.SelectedIndex <= 0)
             {
                 ActiveGestureProfile = null;
@@ -1183,16 +1194,64 @@ namespace XeRxKEYs
 
                         txtActiveGestureProfileDesc.Text = profile.Description;
 
-                        if (profile.Image != "")
+                        if (profile.Image != "" && !StopImageLoads)
                         {
                             string imagePath = Path.Combine(Application.StartupPath, "Images", profile.Image);
 
                             picActiveGestureProfile.Image = Image.FromFile(imagePath);
                         }
+
+                        ImageList smallImageList = new ImageList();
+                        smallImageList.ImageSize = new Size(32, 32);
+                        smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+
+                        lvwActiveMotionGestures.SmallImageList = smallImageList;
+                        lvwActiveMotionGestures.View = View.List;
+
+                        string imageDirectory = Path.Combine(Application.StartupPath, "Images");
+
+                        foreach (MotionGesture gesture in profile.Gestures)
+                        {
+                            int imgIndex = -1;
+
+                            if (gesture.Image != "" && !StopImageLoads)
+                            {
+                                try
+                                {
+                                    Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, gesture.Image));
+                                    smallImageList.Images.Add(gestureIcon);
+                                    imgIndex = smallImageList.Images.Count - 1;
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+
+                            string itemName = gesture.Name + ": " + gesture.Description;
+
+                            if (gesture.Description == "")
+                            {
+                                itemName = gesture.Name + ": [No Description]";
+                            }
+
+                            lvwActiveMotionGestures.Items.Add(new ListViewItem(itemName, imgIndex));
+                        }
+
                         break;
                     }
                 }
             }
+        }
+
+        private void btnEditGestures_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEditMotionGestures_Click(object sender, EventArgs e)
+        {
+
         }
         #endregion
 
@@ -1222,6 +1281,7 @@ namespace XeRxKEYs
         {
             //TODO: Load values into the Trigger Conditions UI
         }
+
         #endregion
 
         
