@@ -54,6 +54,8 @@ namespace XeRxKEYs
 
         private bool StopImageLoads = false;
 
+        private Image noIconImg;
+
         public Main()
         {
             InitializeComponent();
@@ -188,6 +190,8 @@ namespace XeRxKEYs
 
                 }
             }
+
+            noIconImg = Properties.Resources.NoImg;
 
             RefreshMainUI();
         }
@@ -1182,7 +1186,7 @@ namespace XeRxKEYs
             {
                 ActiveGestureProfile = null;
                 txtActiveGestureProfileDesc.Text = "";
-                picActiveGestureProfile.Image = null;
+                picActiveGestureProfile.Image = noIconImg;
             }
             else
             {
@@ -1244,14 +1248,19 @@ namespace XeRxKEYs
             }
         }
 
-        private void btnEditGestures_Click(object sender, EventArgs e)
+        private void btnEditGestureProfiles_Click(object sender, EventArgs e)
         {
+            SetTabPage(tabGestureProfiles);
+        }
 
+        private void btnEditTriggerActions_Click(object sender, EventArgs e)
+        {
+            SetTabPage(tabEditTriggerActions);
         }
 
         private void btnEditMotionGestures_Click(object sender, EventArgs e)
         {
-
+            SetTabPage(tabMotionGestures);
         }
         #endregion
 
@@ -1260,6 +1269,70 @@ namespace XeRxKEYs
         {
             //TODO: Load values into the Gesture Profiles UI
         }
+        private void lvwAllGestureProfiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //TODO: Load the selected Gesture Profile for editing
+        }
+
+        private void btnReturnToMainGP_Click(object sender, EventArgs e)
+        {
+            SetTabPage(tabMain);
+        }
+
+        private void btnSaveEditedGestureProfile_Click(object sender, EventArgs e)
+        {
+            //TODO: Save the changes to global memory
+
+        }
+
+        private void txtEditGestureProfileName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateGestureProfileEditor();
+        }
+
+        private void txtEditGestureProfileDescription_TextChanged(object sender, EventArgs e)
+        {
+            UpdateGestureProfileEditor();
+        }
+
+        private void picEditGestureProfileIcon_Click(object sender, EventArgs e)
+        {
+            SelectImage imageSel = new SelectImage();
+
+            imageSel.SendIconTo(UpdateEditedGestureProfileImage);
+
+            imageSel.ShowDialog(this);
+
+            imageSel.Dispose();
+        }
+
+        public void UpdateEditedGestureProfileImage(string img)
+        {
+            if (img == null || img == "")
+            {
+                //Clear
+                picEditGestureProfileIcon.Image = noIconImg;
+            }
+            else
+            {
+                //Load
+                try
+                {
+                    picEditGestureProfileIcon.Image = Image.FromFile(Path.Combine(Application.StartupPath, "Images", img));
+                }
+                catch
+                {
+                    picEditGestureProfileIcon.Image = noIconImg;
+                }
+            }
+
+            UpdateGestureProfileEditor();
+        }
+
+        public void UpdateGestureProfileEditor()
+        {
+
+        }
         #endregion
 
         #region GESTURES_UI
@@ -1267,12 +1340,151 @@ namespace XeRxKEYs
         {
             //TODO: Load values into the Motion Gestures UI
         }
+
+        private void lvwAllMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCreateNewMotionGesture_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDeleteMotionGesture_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnReturnToMainMG_Click(object sender, EventArgs e)
+        {
+            SetTabPage(tabMain);
+        }
+
+        private void btnSaveEditedMotionGesture_Click(object sender, EventArgs e)
+        {
+            //TODO: Save the modified motion gesture to global memory
+        }
+
+        private void txtEditMotionGestureName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateMotionGestureEditor();
+        }
+
+        private void txtEditMotionGestureDescription_TextChanged(object sender, EventArgs e)
+        {
+            UpdateMotionGestureEditor();
+        }
+
+        private void picEditMotionGestureIcon_Click(object sender, EventArgs e)
+        {
+            SelectImage imageSel = new SelectImage();
+
+            imageSel.SendIconTo(UpdateEditedMotionGestureImage);
+
+            imageSel.ShowDialog(this);
+
+            imageSel.Dispose();
+        }
+
+        public void UpdateEditedMotionGestureImage(string img)
+        {
+            if (img == null || img == "")
+            {
+                //Clear
+                picEditMotionGestureIcon.Image = noIconImg;
+            }
+            else
+            {
+                //Load
+                try
+                {
+                    picEditMotionGestureIcon.Image = Image.FromFile(Path.Combine(Application.StartupPath, "Images", img));
+                }
+                catch
+                {
+                    picEditMotionGestureIcon.Image = noIconImg;
+                }
+            }
+
+            UpdateMotionGestureEditor();
+        }
+
+        private void UpdateMotionGestureEditor()
+        {
+
+        }
+
+        private void btnEditTriggerConditions_Click(object sender, EventArgs e)
+        {
+
+        }
         #endregion
 
         #region ACTIONS_UI
         private void RefreshActionsUI()
         {
             //TODO: Load values into the Trigger Actions UI
+        }
+
+        private void lvwAllTriggerActions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCreateNewTriggerAction_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDeleteTriggerAction_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pnlTriggerActionsRight_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void btnReturnToMainTA_Click(object sender, EventArgs e)
+        {
+            SetTabPage(tabMain);
+        }
+
+        private void btnSaveEditedTriggerAction_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAddNewInput_Click(object sender, EventArgs e)
+        {
+            UpdateTriggerActionEditor();
+        }
+
+        private void btnDeleteInput_Click(object sender, EventArgs e)
+        {
+            UpdateTriggerActionEditor();
+        }
+
+        private void lstEditTriggerActionSendInputs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateTriggerActionEditor();
+        }
+
+        private void txtEditTriggerActionDescription_TextChanged(object sender, EventArgs e)
+        {
+            UpdateTriggerActionEditor();
+        }
+
+        private void txtEditTriggerActionName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateTriggerActionEditor();
+        }
+
+        private void UpdateTriggerActionEditor()
+        {
+
         }
         #endregion
 
@@ -1282,8 +1494,65 @@ namespace XeRxKEYs
             //TODO: Load values into the Trigger Conditions UI
         }
 
-        #endregion
+        private void lvwCurrentTriggerConditions_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
-        
+        }
+
+        private void btnCreateNewTriggerCondition_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDeleteTriggerCondition_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmbTriggerType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCloseTriggerConditionEditor_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void clbTriggerForObjects_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void clbObjectGroupA_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void clbObjectGroupB_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkInvertProxEventTrigger_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkProxEventTriggerOnce_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtMaxDistProxEvent_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtMinDistProxEvent_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
     }
 }
