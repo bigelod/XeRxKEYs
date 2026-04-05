@@ -71,6 +71,8 @@ namespace XeRxKEYs
         private bool _MotionGestureChanged = false;
         private bool _TriggerActionChanged = false;
         private bool _TriggerConditionChanged = false;
+
+        private List<TriggerCondition> _motionGestureTriggerConditions = new List<TriggerCondition>();
         #endregion
 
         #region STARTUP
@@ -1505,16 +1507,17 @@ namespace XeRxKEYs
             lvwProfileEnabledMotionGestures.Items.Clear();
         }
 
-        private void btnReturnToMainGP_Click(object sender, EventArgs e)
+        private void ConfirmProfileEditorSave()
         {
-            ConfirmProfileEditorSave();
+            if (_editingGestureProfile >= 0 && _GestureProfileChanged)
+            {
+                DialogResult result = MessageBox.Show(this, "Changes have been made to current profile, save changes?", "Gesture Profile Changed - Unsaved Changes Will Be Lost!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-            SetTabPage(tabMain);
-        }
-
-        private void btnSaveEditedGestureProfile_Click(object sender, EventArgs e)
-        {
-            SaveGestureProfileEditor();
+                if (result == DialogResult.Yes)
+                {
+                    SaveGestureProfileEditor();
+                }
+            }
         }
 
         private void SaveGestureProfileEditor()
@@ -1554,6 +1557,18 @@ namespace XeRxKEYs
                     MessageBox.Show(this, "Unable to save, Gesture Profile must have a non-blank name! Please change it and try again", "Gesture Profile Name Cannot Be Blank!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void btnReturnToMainGP_Click(object sender, EventArgs e)
+        {
+            ConfirmProfileEditorSave();
+
+            SetTabPage(tabMain);
+        }
+
+        private void btnSaveEditedGestureProfile_Click(object sender, EventArgs e)
+        {
+            SaveGestureProfileEditor();
         }
 
         private void txtEditGestureProfileName_TextChanged(object sender, EventArgs e)
@@ -1637,19 +1652,6 @@ namespace XeRxKEYs
             }
         }
 
-        private void ConfirmProfileEditorSave()
-        {
-            if (_editingGestureProfile >= 0 && _GestureProfileChanged)
-            {
-                DialogResult result = MessageBox.Show(this, "Changes have been made to current profile, save changes?", "Gesture Profile Changed - Unsaved Changes Will Be Lost!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (result == DialogResult.Yes)
-                {
-                    SaveGestureProfileEditor();
-                }
-            }
-        }
-
         private void btnCreateNewGestureProfile_Click(object sender, EventArgs e)
         {
             ConfirmProfileEditorSave();
@@ -1700,12 +1702,184 @@ namespace XeRxKEYs
         #region MOTION_GESTURES_UI
         private void RefreshMotionGesturesUI()
         {
-            //TODO: Load Motion Gestures UI
+            ClearMotionGestureEdit();
+
+            lvwAllMotionGestures.SmallImageList = null;
+            lvwAllMotionGestures.Items.Clear();
+
+            ImageList smallImageList = new ImageList();
+            smallImageList.ImageSize = new Size(32, 32);
+            smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+
+            lvwAllMotionGestures.SmallImageList = smallImageList;
+            lvwAllMotionGestures.View = View.SmallIcon;
+
+            foreach (MotionGesture motion in allMotionGestures)
+            {
+                int imgIndex = -1;
+
+                if (motion.Image != "" && !StopImageLoads)
+                {
+                    try
+                    {
+                        Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, motion.Image));
+                        smallImageList.Images.Add(gestureIcon);
+                        imgIndex = smallImageList.Images.Count - 1;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                lvwAllMotionGestures.Items.Add(new ListViewItem(MinLenStr(motion.Name), imgIndex));
+            }
         }
 
         private void lvwAllMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ConfirmMotionGestureSave();
 
+            _editingMotionGesture = -1;
+
+            if (lvwAllMotionGestures.Items.Count > 0 && lvwAllMotionGestures.SelectedIndices.Count > 0)
+            {
+                txtEditMotionGestureName.Enabled = true;
+                txtEditMotionGestureDescription.Enabled = true;
+                btnDeleteMotionGesture.Enabled = true;
+
+                _editingMotionGesture = lvwAllMotionGestures.SelectedIndices[0];
+
+                MotionGesture motion = allMotionGestures[_editingMotionGesture];
+
+                txtEditMotionGestureName.Text = motion.Name;
+                txtEditMotionGestureDescription.Text = motion.Description;
+
+                if (motion.Image != "")
+                {
+                    _editingMotionGestureImage = motion.Image;
+
+                    if (!StopImageLoads)
+                    {
+                        string imagePath = Path.Combine(imageDirectory, motion.Image);
+
+                        picEditMotionGestureIcon.Image = Image.FromFile(imagePath);
+                    }
+                }
+
+                lstTriggerConditionPreview.Items.Clear();
+                _motionGestureTriggerConditions = new List<TriggerCondition>();
+
+                foreach (TriggerCondition cond in motion.TriggerConditions)
+                {
+                    _motionGestureTriggerConditions.Add(cond);
+                    lstTriggerConditionPreview.Items.Add(cond.Type.ToString());
+                }
+
+                clbEnabledTriggerActions.Items.Clear();
+
+                foreach (TriggerAction action in allTriggerActions)
+                {
+                    clbEnabledTriggerActions.Items.Add(action.Name);
+
+                    foreach (TriggerAction enabledAction in motion.TriggerActions)
+                    {
+                        if (enabledAction.Name == action.Name)
+                        {
+                            clbEnabledTriggerActions.SetItemChecked(clbEnabledTriggerActions.Items.Count - 1, true);
+                        }
+                    }
+                }
+
+                _MotionGestureChanged = false;
+                UpdateMotionGestureEditor();
+            }
+            else
+            {
+                ClearMotionGestureEdit();
+            }
+        }
+
+        private void ClearMotionGestureEdit()
+        {
+            _editingMotionGestureImage = "";
+            _editingMotionGesture = -1;
+            _MotionGestureChanged = false;
+            btnSaveEditedMotionGesture.Enabled = false;
+            btnDeleteMotionGesture.Enabled = false;
+            txtEditMotionGestureName.Text = "";
+            picEditMotionGestureIcon.Image = noIconImg;
+            txtEditMotionGestureDescription.Text = "";
+
+            txtEditMotionGestureName.Enabled = false;
+            txtEditMotionGestureDescription.Enabled = false;
+
+            clbEnabledTriggerActions.Items.Clear();
+            lstTriggerConditionPreview.Items.Clear();
+        }
+
+        private void ConfirmMotionGestureSave()
+        {
+            if (_editingMotionGesture >= 0 && _MotionGestureChanged)
+            {
+                DialogResult result = MessageBox.Show(this, "Changes have been made to current gesture, save changes?", "Motion Gesture Changed - Unsaved Changes Will Be Lost!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    SaveMotionGestureProfileEditor();
+                }
+            }
+        }
+
+        private void SaveMotionGestureProfileEditor()
+        {
+            if (_editingMotionGesture >= 0 && allMotionGestures.Count > _editingMotionGesture)
+            {
+                if (txtEditMotionGestureName.Text != "")
+                {
+                    if (allGestureProfiles[_editingMotionGesture].Name != txtEditMotionGestureName.Text)
+                    {
+                        //Name change, delete old file
+                        DeleteMotionGestureFile(allMotionGestures[_editingMotionGesture]);
+                        allMotionGestures[_editingMotionGesture].Name = txtEditMotionGestureName.Text;
+                    }
+
+                    allMotionGestures[_editingMotionGesture].Description = txtEditMotionGestureDescription.Text;
+                    allMotionGestures[_editingMotionGesture].Image = _editingMotionGestureImage;
+
+                    List<TriggerAction> activeTriggerActions = new List<TriggerAction>();
+
+                    if (clbEnabledTriggerActions.CheckedItems.Count > 0)
+                    {
+                        for (int i = 0; i < allTriggerActions.Count; i++)
+                        {
+                            if (clbEnabledTriggerActions.Items.Count > i)
+                            {
+                                if (clbEnabledTriggerActions.GetItemChecked(i))
+                                {
+                                    activeTriggerActions.Add(allTriggerActions[i]);
+                                }
+                            }
+                        }
+                    }
+
+                    allMotionGestures[_editingMotionGesture].TriggerActions = activeTriggerActions;
+                    allMotionGestures[_editingMotionGesture].TriggerConditions = new List<TriggerCondition>();
+
+                    foreach (TriggerCondition cond in _motionGestureTriggerConditions)
+                    {
+                        allMotionGestures[_editingMotionGesture].TriggerConditions.Add(cond);
+                    }
+
+                    DeDuplicateAssets();
+
+                    RefreshMotionGesturesUI();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Unable to save, Motion Gesture must have a non-blank name! Please change it and try again", "Motion Gesture Name Cannot Be Blank!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void btnCreateNewMotionGesture_Click(object sender, EventArgs e)
@@ -1730,11 +1904,15 @@ namespace XeRxKEYs
 
         private void txtEditMotionGestureName_TextChanged(object sender, EventArgs e)
         {
+            if (_editingMotionGesture >= 0 && txtEditMotionGestureName.Text != "") _MotionGestureChanged = true;
+
             UpdateMotionGestureEditor();
         }
 
         private void txtEditMotionGestureDescription_TextChanged(object sender, EventArgs e)
         {
+            if (_editingMotionGesture >= 0) _MotionGestureChanged = true;
+
             UpdateMotionGestureEditor();
         }
 

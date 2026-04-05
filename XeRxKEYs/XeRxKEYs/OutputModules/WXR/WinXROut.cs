@@ -106,11 +106,11 @@ namespace XeRxKEYs.OutputModules.WXRModule
         {
             List<string> sendKeys = new List<string>();
 
-            int leftClick = 0;
-            int rightClick = 0;
-            int middleClick = 0;
-            int scrollUp = 0;
-            int scrollDown = 0;
+            string leftClick = "F";
+            string rightClick = "F";
+            string middleClick = "F";
+            string scrollUp = "F";
+            string scrollDown = "F";
 
             foreach (SendableInput input in inputs)
             {
@@ -127,19 +127,19 @@ namespace XeRxKEYs.OutputModules.WXRModule
                     if (input.MouseScrollAmount >= 0)
                     {
                         //UP
-                        scrollUp = 1;
+                        scrollUp = "T";
                     }
                     else
                     {
                         //Down
-                        scrollDown = 1;
+                        scrollDown = "T";
                     }
                 }
                 else if (input.Type == SendType.MouseClick)
                 {
-                    if (input.MouseButton == 0) leftClick = 1;
-                    if (input.MouseButton == 1) rightClick = 1;
-                    if (input.MouseButton == 2) middleClick = 1;
+                    if (input.MouseButton == 0) leftClick = "T";
+                    if (input.MouseButton == 1) rightClick = "T";
+                    if (input.MouseButton == 2) middleClick = "T";
                 }
             }
 
@@ -148,9 +148,9 @@ namespace XeRxKEYs.OutputModules.WXRModule
                 SendData(XKeycode.ToKeyCombo(sendKeys));
             }
 
-            if (leftClick + rightClick + middleClick + scrollUp + scrollDown > 0)
+            if (leftClick + rightClick + middleClick + scrollUp + scrollDown != "FFFFF")
             {
-                SendData("M," + leftClick.ToString() + "," + rightClick.ToString() + "," + middleClick.ToString() + "," + scrollUp.ToString() + "," + scrollDown.ToString());
+                SendData("M," + leftClick + rightClick + middleClick + scrollUp + scrollDown);
             }
         }
 

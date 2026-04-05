@@ -975,9 +975,9 @@
             this.label28.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label28.Location = new System.Drawing.Point(264, 158);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(114, 13);
+            this.label28.Size = new System.Drawing.Size(146, 13);
             this.label28.TabIndex = 40;
-            this.label28.Text = "Trigger Conditions:";
+            this.label28.Text = "Trigger Condition Types:";
             // 
             // lstTriggerConditionPreview
             // 
