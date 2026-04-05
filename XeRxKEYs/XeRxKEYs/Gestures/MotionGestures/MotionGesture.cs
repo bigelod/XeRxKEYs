@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
@@ -10,6 +11,7 @@ using XeRxKEYs.Gestures.Triggers.Actions;
 
 namespace XeRxKEYs.Gestures.MotionGestures
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class MotionGesture
     {
         public SerializableJSONDataType Type = SerializableJSONDataType.MOTIONGESTURE;
@@ -28,6 +30,9 @@ namespace XeRxKEYs.Gestures.MotionGestures
 
         public bool TriggerOnAnyCondition { get; set; }
 
+        [JsonIgnore]
+        public string OriginalFileName { get; set; }
+
         private float cooldownTimer = 0f;
 
         public MotionGesture(string _name, string _desc = "", string _img = "", bool _triggerAny = false)
@@ -43,6 +48,8 @@ namespace XeRxKEYs.Gestures.MotionGestures
             TriggerConditions = new List<TriggerCondition>();
             TriggerActions = new List<TriggerAction>();
             TriggerOnAnyCondition = _triggerAny;
+
+            OriginalFileName = "";
         }
 
         public void OnLoad(ref IXRModule xrModuleInstance)

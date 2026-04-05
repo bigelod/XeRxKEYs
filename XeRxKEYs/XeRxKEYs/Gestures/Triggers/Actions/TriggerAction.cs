@@ -23,6 +23,9 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
         [JsonIgnore]
         public List<SendableInputCombo> InputCombos { get; set; }
 
+        [JsonIgnore]
+        public string OriginalFileName { get; set; }
+
         private float waitTimer = 0f;
 
         public TriggerAction(string _name, string _desc = "", float _wait = 0.0f)
@@ -35,6 +38,7 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
             InputCombos = new List<SendableInputCombo>();
 
             waitTimer = 0f;
+            OriginalFileName = "";
         }
 
         public void PrepareSendableInputs()

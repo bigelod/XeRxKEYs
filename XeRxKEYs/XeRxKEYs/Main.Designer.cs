@@ -296,9 +296,9 @@
             // 
             // btnEditTriggerActions
             // 
-            this.btnEditTriggerActions.Location = new System.Drawing.Point(410, 270);
+            this.btnEditTriggerActions.Location = new System.Drawing.Point(537, 240);
             this.btnEditTriggerActions.Name = "btnEditTriggerActions";
-            this.btnEditTriggerActions.Size = new System.Drawing.Size(145, 124);
+            this.btnEditTriggerActions.Size = new System.Drawing.Size(231, 63);
             this.btnEditTriggerActions.TabIndex = 21;
             this.btnEditTriggerActions.Text = "Edit Trigger Action Library";
             this.btnEditTriggerActions.UseVisualStyleBackColor = true;
@@ -306,9 +306,9 @@
             // 
             // btnEditMotionGestures
             // 
-            this.btnEditMotionGestures.Location = new System.Drawing.Point(587, 130);
+            this.btnEditMotionGestures.Location = new System.Drawing.Point(537, 171);
             this.btnEditMotionGestures.Name = "btnEditMotionGestures";
-            this.btnEditMotionGestures.Size = new System.Drawing.Size(144, 124);
+            this.btnEditMotionGestures.Size = new System.Drawing.Size(231, 63);
             this.btnEditMotionGestures.TabIndex = 20;
             this.btnEditMotionGestures.Text = "Edit Motion Gesture Library";
             this.btnEditMotionGestures.UseVisualStyleBackColor = true;
@@ -316,9 +316,9 @@
             // 
             // btnEditGestureProfiles
             // 
-            this.btnEditGestureProfiles.Location = new System.Drawing.Point(410, 130);
+            this.btnEditGestureProfiles.Location = new System.Drawing.Point(537, 102);
             this.btnEditGestureProfiles.Name = "btnEditGestureProfiles";
-            this.btnEditGestureProfiles.Size = new System.Drawing.Size(145, 124);
+            this.btnEditGestureProfiles.Size = new System.Drawing.Size(231, 63);
             this.btnEditGestureProfiles.TabIndex = 19;
             this.btnEditGestureProfiles.Text = "Edit Gesture Profile Library";
             this.btnEditGestureProfiles.UseVisualStyleBackColor = true;
@@ -328,23 +328,24 @@
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label15.Location = new System.Drawing.Point(8, 86);
+            this.label15.Location = new System.Drawing.Point(40, 102);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(143, 13);
+            this.label15.Size = new System.Drawing.Size(103, 13);
             this.label15.TabIndex = 18;
-            this.label15.Text = "Active Motion Gestures:";
+            this.label15.Text = "Motion Gestures:";
             // 
             // lvwActiveMotionGestures
             // 
             this.lvwActiveMotionGestures.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lvwActiveMotionGestures.HideSelection = false;
-            this.lvwActiveMotionGestures.Location = new System.Drawing.Point(11, 102);
+            this.lvwActiveMotionGestures.Location = new System.Drawing.Point(149, 102);
             this.lvwActiveMotionGestures.MultiSelect = false;
             this.lvwActiveMotionGestures.Name = "lvwActiveMotionGestures";
-            this.lvwActiveMotionGestures.Size = new System.Drawing.Size(348, 301);
+            this.lvwActiveMotionGestures.Size = new System.Drawing.Size(315, 289);
             this.lvwActiveMotionGestures.TabIndex = 17;
             this.lvwActiveMotionGestures.UseCompatibleStateImageBehavior = false;
+            this.lvwActiveMotionGestures.SelectedIndexChanged += new System.EventHandler(this.lvwActiveMotionGestures_SelectedIndexChanged);
             // 
             // btnIconSelectPopup
             // 
@@ -359,9 +360,9 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(644, 371);
+            this.btnExit.Location = new System.Drawing.Point(623, 371);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(124, 32);
+            this.btnExit.Size = new System.Drawing.Size(145, 32);
             this.btnExit.TabIndex = 15;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = true;
@@ -369,9 +370,9 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(644, 333);
+            this.btnSettings.Location = new System.Drawing.Point(623, 333);
             this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(124, 32);
+            this.btnSettings.Size = new System.Drawing.Size(145, 32);
             this.btnSettings.TabIndex = 14;
             this.btnSettings.Text = "Settings";
             this.btnSettings.UseVisualStyleBackColor = true;
@@ -391,7 +392,7 @@
             // 
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(68, 41);
+            this.label14.Location = new System.Drawing.Point(68, 39);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(75, 13);
             this.label14.TabIndex = 12;
@@ -403,7 +404,7 @@
             this.txtActiveGestureProfileDesc.Multiline = true;
             this.txtActiveGestureProfileDesc.Name = "txtActiveGestureProfileDesc";
             this.txtActiveGestureProfileDesc.ReadOnly = true;
-            this.txtActiveGestureProfileDesc.Size = new System.Drawing.Size(210, 49);
+            this.txtActiveGestureProfileDesc.Size = new System.Drawing.Size(210, 60);
             this.txtActiveGestureProfileDesc.TabIndex = 11;
             // 
             // label13
@@ -766,6 +767,7 @@
             this.lvwProfileEnabledMotionGestures.Size = new System.Drawing.Size(472, 218);
             this.lvwProfileEnabledMotionGestures.TabIndex = 28;
             this.lvwProfileEnabledMotionGestures.UseCompatibleStateImageBehavior = false;
+            this.lvwProfileEnabledMotionGestures.SelectedIndexChanged += new System.EventHandler(this.lvwProfileEnabledMotionGestures_SelectedIndexChanged);
             // 
             // label26
             // 
@@ -902,6 +904,7 @@
             this.btnDeleteGestureProfile.TabIndex = 17;
             this.btnDeleteGestureProfile.Text = "Delete";
             this.btnDeleteGestureProfile.UseVisualStyleBackColor = true;
+            this.btnDeleteGestureProfile.Click += new System.EventHandler(this.btnDeleteGestureProfile_Click);
             // 
             // btnCreateNewGestureProfile
             // 
@@ -911,6 +914,7 @@
             this.btnCreateNewGestureProfile.TabIndex = 16;
             this.btnCreateNewGestureProfile.Text = "Create New";
             this.btnCreateNewGestureProfile.UseVisualStyleBackColor = true;
+            this.btnCreateNewGestureProfile.Click += new System.EventHandler(this.btnCreateNewGestureProfile_Click);
             // 
             // pnlGestureProfilesTop
             // 
@@ -969,7 +973,7 @@
             // 
             this.label28.AutoSize = true;
             this.label28.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(268, 154);
+            this.label28.Location = new System.Drawing.Point(264, 158);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(114, 13);
             this.label28.TabIndex = 40;
@@ -1000,7 +1004,7 @@
             this.chkEditMotionProfileTriggerOnAny.Checked = true;
             this.chkEditMotionProfileTriggerOnAny.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkEditMotionProfileTriggerOnAny.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkEditMotionProfileTriggerOnAny.Location = new System.Drawing.Point(267, 130);
+            this.chkEditMotionProfileTriggerOnAny.Location = new System.Drawing.Point(297, 130);
             this.chkEditMotionProfileTriggerOnAny.Name = "chkEditMotionProfileTriggerOnAny";
             this.chkEditMotionProfileTriggerOnAny.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.chkEditMotionProfileTriggerOnAny.Size = new System.Drawing.Size(197, 17);
@@ -1351,6 +1355,7 @@
             this.pnlTriggerActionsBottom.Name = "pnlTriggerActionsBottom";
             this.pnlTriggerActionsBottom.Size = new System.Drawing.Size(260, 47);
             this.pnlTriggerActionsBottom.TabIndex = 20;
+            this.pnlTriggerActionsBottom.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlTriggerActionsBottom_Paint);
             // 
             // btnDeleteTriggerAction
             // 

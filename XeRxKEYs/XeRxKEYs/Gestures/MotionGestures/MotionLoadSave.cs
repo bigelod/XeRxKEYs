@@ -91,6 +91,7 @@ namespace XeRxKEYs.Gestures.MotionGestures
                     MotionGesture profile = JsonConvert.DeserializeObject<MotionGesture>(jsonString);
                     if (profile != null && profile.Type == SerializableJSONDataType.MOTIONGESTURE)
                     {
+                        profile.OriginalFileName = filePath;
                         profile.OnLoad(ref xrModuleInstance);
                         motionProfiles.Add(profile);
                     }

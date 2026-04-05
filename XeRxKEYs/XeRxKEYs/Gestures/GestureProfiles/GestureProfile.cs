@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using XeRxKEYs.Gestures.MotionGestures;
 
 namespace XeRxKEYs.Gestures.GestureProfiles
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class GestureProfile
     {
         public SerializableJSONDataType Type = SerializableJSONDataType.GESTUREPROFILE;
@@ -16,11 +18,15 @@ namespace XeRxKEYs.Gestures.GestureProfiles
 
         public List<MotionGesture> Gestures { get; set; }
 
+        [JsonIgnore]
+        public string OriginalFileName { get; set; }
+
         public GestureProfile(string _name, string _desc = "", string _img = "") {
             Name = _name;
             Description = _desc;
             Image = _img;
             Gestures = new List<MotionGesture>();
+            OriginalFileName = "";
         }
 
         public void OnLoad(ref IXRModule xrModuleInstance)

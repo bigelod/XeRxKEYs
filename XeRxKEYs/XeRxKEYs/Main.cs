@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,12 +20,12 @@ using XeRxKEYs.Gestures.MotionGestures;
 using XeRxKEYs.Gestures.Triggers;
 using XeRxKEYs.Gestures.Triggers.Actions;
 using XeRxKEYs.Properties;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace XeRxKEYs
 {
     public partial class Main : Form
     {
+        #region VARIABLES
         private const int inputSendTime = 5000; //TODO: Send input more frequently than once every 5 seconds once testing is further along
         private System.Threading.Timer _keySenderTimer;
 
@@ -56,6 +57,23 @@ namespace XeRxKEYs
 
         private Image noIconImg;
 
+        private string imageDirectory = "";
+
+        private int _editingGestureProfile = -1;
+        private int _editingMotionGesture = -1;
+        private int _editingTriggerAction = -1;
+        private int _editingTriggerCondition = -1;
+
+        private string _editingGestureProfileImage = "";
+        private string _editingMotionGestureImage = "";
+
+        private bool _GestureProfileChanged = false;
+        private bool _MotionGestureChanged = false;
+        private bool _TriggerActionChanged = false;
+        private bool _TriggerConditionChanged = false;
+        #endregion
+
+        #region STARTUP
         public Main()
         {
             InitializeComponent();
@@ -73,6 +91,10 @@ namespace XeRxKEYs
 
             _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
             _cooldownTimer = new System.Threading.Timer(CooldownCallback, null, cooldownTimeMS, cooldownTimeMS);
+
+            imageDirectory = Path.Combine(Application.StartupPath, "Images");
+
+            lvwProfileEnabledMotionGestures.ItemChecked += lvwProfileEnabledMotionGestures_ItemChecked;
 
             LoadAllXRModules();
             LoadAllOutputModules();
@@ -195,6 +217,7 @@ namespace XeRxKEYs
 
             RefreshMainUI();
         }
+        #endregion
 
         #region BACKEND_CORE
 
@@ -470,6 +493,51 @@ namespace XeRxKEYs
             SaveGestureProfiles();
         }
 
+        private void DeleteGestureProfileFile(GestureProfile profile)
+        {
+            if (profile.OriginalFileName == "") return;
+
+            try
+            {
+                File.Delete(profile.OriginalFileName);
+                profile.OriginalFileName = "";
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void DeleteMotionGestureFile(MotionGesture gesture)
+        {
+            if (gesture.OriginalFileName == "") return;
+
+            try
+            {
+                File.Delete(gesture.OriginalFileName);
+                gesture.OriginalFileName = "";
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void DeleteTriggerActionFile(TriggerAction action)
+        {
+            if (action.OriginalFileName == "") return;
+
+            try
+            {
+                File.Delete(action.OriginalFileName);
+                action.OriginalFileName = "";
+            }
+            catch
+            {
+
+            }
+        }
+
         private void LoadTriggerActions()
         {
             ActionLoadSave.LoadProfiles(ref allTriggerActions);
@@ -632,6 +700,28 @@ namespace XeRxKEYs
 
         }
 
+        private string MinLenStr(string inStr, int len = 50, bool spaceAhead = false)
+        {
+            string ans = "";
+
+            if ((len - inStr.Length) > 0)
+            {
+                while (ans.Length < (len - inStr.Length))
+                {
+                    ans += " ";
+                }
+            }
+
+            if (spaceAhead)
+            {
+                return ans + inStr;
+            }
+            else
+            {
+                return inStr + ans;
+            }
+        }
+
         #endregion BACKEND_CORE
 
         #region TESTS
@@ -696,13 +786,16 @@ namespace XeRxKEYs
 
         private void btnInputSelectPopupTest_Click(object sender, EventArgs e)
         {
-            SelectInput inputSel = new SelectInput();
+            if (btnInputSelectPopupTest.Visible)
+            {
+                SelectInput inputSel = new SelectInput();
 
-            inputSel.SendInputTo(ReceiveInputTest);
+                inputSel.SendInputTo(ReceiveInputTest);
 
-            inputSel.ShowDialog(this);
+                inputSel.ShowDialog(this);
 
-            inputSel.Dispose();
+                inputSel.Dispose();
+            }
         }
 
         public void ReceiveInputTest(SendableInput input)
@@ -719,13 +812,16 @@ namespace XeRxKEYs
 
         private void btnIconSelectPopup_Click(object sender, EventArgs e)
         {
-            SelectImage imageSel = new SelectImage();
+            if (btnIconSelectPopup.Visible)
+            {
+                SelectImage imageSel = new SelectImage();
 
-            imageSel.SendIconTo(ReceiveIconName);
+                imageSel.SendIconTo(ReceiveIconName);
 
-            imageSel.ShowDialog(this);
+                imageSel.ShowDialog(this);
 
-            imageSel.Dispose();
+                imageSel.Dispose();
+            }
         }
 
         public void ReceiveIconName(string name)
@@ -775,19 +871,19 @@ namespace XeRxKEYs
             }
             else if (tcDisplayTabs.SelectedTab == tabGestureProfiles)
             {
-                RefreshProfilesUI();
+                RefreshGestureProfilesUI();
             }
             else if (tcDisplayTabs.SelectedTab == tabMotionGestures)
             {
-                RefreshGesturesUI();
+                RefreshMotionGesturesUI();
             }
             else if (tcDisplayTabs.SelectedTab == tabEditTriggerActions)
             {
-                RefreshActionsUI();
+                RefreshTriggerActionsUI();
             }
             else if (tcDisplayTabs.SelectedTab == tabTriggerConditions)
             {
-                RefreshConditionsUI();
+                RefreshTriggerConditionsUI();
             }
         }
 
@@ -1200,7 +1296,7 @@ namespace XeRxKEYs
 
                         if (profile.Image != "" && !StopImageLoads)
                         {
-                            string imagePath = Path.Combine(Application.StartupPath, "Images", profile.Image);
+                            string imagePath = Path.Combine(imageDirectory, profile.Image);
 
                             picActiveGestureProfile.Image = Image.FromFile(imagePath);
                         }
@@ -1210,9 +1306,7 @@ namespace XeRxKEYs
                         smallImageList.ColorDepth = ColorDepth.Depth32Bit;
 
                         lvwActiveMotionGestures.SmallImageList = smallImageList;
-                        lvwActiveMotionGestures.View = View.List;
-
-                        string imageDirectory = Path.Combine(Application.StartupPath, "Images");
+                        lvwActiveMotionGestures.View = View.SmallIcon;
 
                         foreach (MotionGesture gesture in profile.Gestures)
                         {
@@ -1232,11 +1326,11 @@ namespace XeRxKEYs
                                 }
                             }
 
-                            string itemName = gesture.Name + ": " + gesture.Description;
+                            string itemName = MinLenStr(gesture.Name + ": " + gesture.Description, 80);
 
                             if (gesture.Description == "")
                             {
-                                itemName = gesture.Name + ": [No Description]";
+                                itemName = MinLenStr(gesture.Name + ": [No Description]", 80);
                             }
 
                             lvwActiveMotionGestures.Items.Add(new ListViewItem(itemName, imgIndex));
@@ -1262,48 +1356,232 @@ namespace XeRxKEYs
         {
             SetTabPage(tabMotionGestures);
         }
+
+        private void lvwActiveMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
         #endregion
 
-        #region PROFILES_UI
-        private void RefreshProfilesUI()
+        #region GESTURE_PROFILES_UI
+        private void RefreshGestureProfilesUI()
         {
-            //TODO: Load values into the Gesture Profiles UI
+            ClearGestureProfileEdit();
+
+            lvwAllGestureProfiles.SmallImageList = null;
+            lvwAllGestureProfiles.Items.Clear();
+
+            ImageList smallImageList = new ImageList();
+            smallImageList.ImageSize = new Size(32, 32);
+            smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+
+            lvwAllGestureProfiles.SmallImageList = smallImageList;
+            lvwAllGestureProfiles.View = View.SmallIcon;
+
+            foreach (GestureProfile profile in allGestureProfiles)
+            {
+                int imgIndex = -1;
+
+                if (profile.Image != "" && !StopImageLoads)
+                {
+                    try
+                    {
+                        Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, profile.Image));
+                        smallImageList.Images.Add(gestureIcon);
+                        imgIndex = smallImageList.Images.Count - 1;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                lvwAllGestureProfiles.Items.Add(new ListViewItem(MinLenStr(profile.Name), imgIndex));
+            }
         }
         private void lvwAllGestureProfiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: Load the selected Gesture Profile for editing
+            ConfirmProfileEditorSave();
+
+            _editingGestureProfile = -1;
+
+            lvwProfileEnabledMotionGestures.SmallImageList = null;
+            lvwProfileEnabledMotionGestures.Items.Clear();
+
+            if (lvwAllGestureProfiles.Items.Count > 0 && lvwAllGestureProfiles.SelectedIndices.Count > 0)
+            {
+                txtEditGestureProfileName.Enabled = true;
+                txtEditGestureProfileDescription.Enabled = true;
+                btnDeleteGestureProfile.Enabled = true;
+
+                _editingGestureProfile = lvwAllGestureProfiles.SelectedIndices[0];
+
+                GestureProfile profile = allGestureProfiles[_editingGestureProfile];
+
+                txtEditGestureProfileName.Text = profile.Name;
+                txtEditGestureProfileDescription.Text = profile.Description;
+
+                if (profile.Image != "")
+                {
+                    _editingGestureProfileImage = profile.Image;
+
+                    if (!StopImageLoads)
+                    {
+                        string imagePath = Path.Combine(imageDirectory, profile.Image);
+
+                        picEditGestureProfileIcon.Image = Image.FromFile(imagePath);
+                    }
+                }
+
+                ImageList smallImageList = new ImageList();
+                smallImageList.ImageSize = new Size(32, 32);
+                smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+
+                lvwProfileEnabledMotionGestures.SmallImageList = smallImageList;
+                lvwProfileEnabledMotionGestures.View = View.SmallIcon;
+
+                foreach (MotionGesture gesture in allMotionGestures)
+                {
+                    int imgIndex = -1;
+
+                    if (gesture.Image != "" && !StopImageLoads)
+                    {
+                        try
+                        {
+                            Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, gesture.Image));
+                            smallImageList.Images.Add(gestureIcon);
+                            imgIndex = smallImageList.Images.Count - 1;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+
+                    string itemName = MinLenStr(gesture.Name + ": " + gesture.Description, 110);
+
+                    if (gesture.Description == "")
+                    {
+                        itemName = MinLenStr(gesture.Name + ": [No Description]", 110);
+                    }
+
+                    lvwProfileEnabledMotionGestures.Items.Add(new ListViewItem(itemName, imgIndex));
+
+                    foreach (MotionGesture activeGesture in profile.Gestures)
+                    {
+                        if (activeGesture.Name == gesture.Name)
+                        {
+                            lvwProfileEnabledMotionGestures.Items[lvwProfileEnabledMotionGestures.Items.Count - 1].Checked = true;
+
+                            break;
+                        }
+                    }
+                }
+
+                _GestureProfileChanged = false;
+                UpdateGestureProfileEditor();
+            }
+            else
+            {
+                ClearGestureProfileEdit();
+            }
+        }
+
+        private void ClearGestureProfileEdit()
+        {
+            _editingGestureProfileImage = "";
+            _editingGestureProfile = -1;
+            _GestureProfileChanged = false;
+            btnSaveEditedGestureProfile.Enabled = false;
+            btnDeleteGestureProfile.Enabled = false;
+            txtEditGestureProfileName.Text = "";
+            picEditGestureProfileIcon.Image = noIconImg;
+            txtEditGestureProfileDescription.Text = "";
+
+            txtEditGestureProfileName.Enabled = false;
+            txtEditGestureProfileDescription.Enabled = false;
+
+            lvwProfileEnabledMotionGestures.SmallImageList = null;
+            lvwProfileEnabledMotionGestures.Items.Clear();
         }
 
         private void btnReturnToMainGP_Click(object sender, EventArgs e)
         {
+            ConfirmProfileEditorSave();
+
             SetTabPage(tabMain);
         }
 
         private void btnSaveEditedGestureProfile_Click(object sender, EventArgs e)
         {
-            //TODO: Save the changes to global memory
+            SaveGestureProfileEditor();
+        }
 
+        private void SaveGestureProfileEditor()
+        {
+            if (_editingGestureProfile >= 0 && allGestureProfiles.Count > _editingGestureProfile)
+            {
+                if (txtEditGestureProfileName.Text != "")
+                {
+                    if (allGestureProfiles[_editingGestureProfile].Name != txtEditGestureProfileName.Text)
+                    {
+                        //Name change, delete old file
+                        DeleteGestureProfileFile(allGestureProfiles[_editingGestureProfile]);
+                        allGestureProfiles[_editingGestureProfile].Name = txtEditGestureProfileName.Text;
+                    }
+
+                    allGestureProfiles[_editingGestureProfile].Description = txtEditGestureProfileDescription.Text;
+                    allGestureProfiles[_editingGestureProfile].Image = _editingGestureProfileImage;
+
+                    List<MotionGesture> activeMotionGestures = new List<MotionGesture>();
+
+                    foreach (ListViewItem item in lvwProfileEnabledMotionGestures.Items)
+                    {
+                        if (item.Checked && allMotionGestures.Count > item.Index)
+                        {
+                            activeMotionGestures.Add(allMotionGestures[item.Index]);
+                        }
+                    }
+
+                    allGestureProfiles[_editingGestureProfile].Gestures = activeMotionGestures;
+
+                    DeDuplicateAssets();
+
+                    RefreshGestureProfilesUI();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Unable to save, Gesture Profile must have a non-blank name! Please change it and try again", "Gesture Profile Name Cannot Be Blank!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void txtEditGestureProfileName_TextChanged(object sender, EventArgs e)
         {
+            if (_editingGestureProfile >= 0 && txtEditGestureProfileName.Text != "") _GestureProfileChanged = true;
+
             UpdateGestureProfileEditor();
         }
 
         private void txtEditGestureProfileDescription_TextChanged(object sender, EventArgs e)
         {
+            if (_editingGestureProfile >= 0) _GestureProfileChanged = true;
+
             UpdateGestureProfileEditor();
         }
 
         private void picEditGestureProfileIcon_Click(object sender, EventArgs e)
         {
-            SelectImage imageSel = new SelectImage();
+            if (_editingGestureProfile >= 0)
+            {
+                SelectImage imageSel = new SelectImage();
 
-            imageSel.SendIconTo(UpdateEditedGestureProfileImage);
+                imageSel.SendIconTo(UpdateEditedGestureProfileImage);
 
-            imageSel.ShowDialog(this);
+                imageSel.ShowDialog(this);
 
-            imageSel.Dispose();
+                imageSel.Dispose();
+            }
         }
 
         public void UpdateEditedGestureProfileImage(string img)
@@ -1311,19 +1589,29 @@ namespace XeRxKEYs
             if (img == null || img == "")
             {
                 //Clear
-                picEditGestureProfileIcon.Image = noIconImg;
+                _editingGestureProfileImage = "";
+
+                if (picEditGestureProfileIcon.Image != noIconImg)
+                {
+                    picEditGestureProfileIcon.Image = noIconImg;
+                    _GestureProfileChanged = true;
+                }
             }
             else
             {
                 //Load
+                _editingGestureProfileImage = img;
+
                 try
                 {
-                    picEditGestureProfileIcon.Image = Image.FromFile(Path.Combine(Application.StartupPath, "Images", img));
+                    picEditGestureProfileIcon.Image = Image.FromFile(Path.Combine(imageDirectory, img));
                 }
                 catch
                 {
                     picEditGestureProfileIcon.Image = noIconImg;
                 }
+
+                _GestureProfileChanged = true;
             }
 
             UpdateGestureProfileEditor();
@@ -1331,14 +1619,88 @@ namespace XeRxKEYs
 
         public void UpdateGestureProfileEditor()
         {
+            if (_GestureProfileChanged && _editingGestureProfile >= 0)
+            {
+                if (txtEditGestureProfileName.Text != "")
+                {
+                    btnSaveEditedGestureProfile.Enabled = true;
+                }
+                else
+                {
+                    btnSaveEditedGestureProfile.Enabled = false;
+                }
+            }
+            else
+            {
+                _GestureProfileChanged = false;
+                btnSaveEditedGestureProfile.Enabled = false;
+            }
+        }
 
+        private void ConfirmProfileEditorSave()
+        {
+            if (_editingGestureProfile >= 0 && _GestureProfileChanged)
+            {
+                DialogResult result = MessageBox.Show(this, "Changes have been made to current profile, save changes?", "Gesture Profile Changed - Unsaved Changes Will Be Lost!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    SaveGestureProfileEditor();
+                }
+            }
+        }
+
+        private void btnCreateNewGestureProfile_Click(object sender, EventArgs e)
+        {
+            ConfirmProfileEditorSave();
+
+            allGestureProfiles.Add(new GestureProfile("NewProfile-" + DateTime.Now.ToString("ddHHmmssffff")));
+
+            RefreshGestureProfilesUI();
+        }
+
+        private void btnDeleteGestureProfile_Click(object sender, EventArgs e)
+        {
+            if (lvwAllGestureProfiles.Items.Count > 0 && lvwAllGestureProfiles.SelectedIndices.Count > 0)
+            {
+                DialogResult confirmDelete = MessageBox.Show(this, "Delete this Gesture Profile? This cannot be undone!", "Confirm Profile Delete?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+                if (confirmDelete == DialogResult.OK)
+                {
+                    int index = lvwAllGestureProfiles.SelectedIndices[0];
+
+                    if (index < lvwAllGestureProfiles.Items.Count)
+                    {
+                        DeleteGestureProfileFile(allGestureProfiles[index]);
+
+                        allGestureProfiles.RemoveAt(index);
+                    }
+
+                    RefreshGestureProfilesUI();
+                }
+            }
+        }
+
+        private void lvwProfileEnabledMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lvwProfileEnabledMotionGestures_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (_editingGestureProfile >= 0)
+            {
+                _GestureProfileChanged = true;
+            }
+
+            UpdateGestureProfileEditor();
         }
         #endregion
 
-        #region GESTURES_UI
-        private void RefreshGesturesUI()
+        #region MOTION_GESTURES_UI
+        private void RefreshMotionGesturesUI()
         {
-            //TODO: Load values into the Motion Gestures UI
+            //TODO: Load Motion Gestures UI
         }
 
         private void lvwAllMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
@@ -1399,7 +1761,7 @@ namespace XeRxKEYs
                 //Load
                 try
                 {
-                    picEditMotionGestureIcon.Image = Image.FromFile(Path.Combine(Application.StartupPath, "Images", img));
+                    picEditMotionGestureIcon.Image = Image.FromFile(Path.Combine(imageDirectory, img));
                 }
                 catch
                 {
@@ -1421,8 +1783,8 @@ namespace XeRxKEYs
         }
         #endregion
 
-        #region ACTIONS_UI
-        private void RefreshActionsUI()
+        #region TRIGGER_ACTIONS_UI
+        private void RefreshTriggerActionsUI()
         {
             //TODO: Load values into the Trigger Actions UI
         }
@@ -1486,10 +1848,15 @@ namespace XeRxKEYs
         {
 
         }
+
+        private void pnlTriggerActionsBottom_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
         #endregion
 
-        #region CONDITIONS_UI
-        private void RefreshConditionsUI()
+        #region TRIGGER_CONDITIONS_UI
+        private void RefreshTriggerConditionsUI()
         {
             //TODO: Load values into the Trigger Conditions UI
         }

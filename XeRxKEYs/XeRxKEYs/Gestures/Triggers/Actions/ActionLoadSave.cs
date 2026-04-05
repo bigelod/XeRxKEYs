@@ -65,6 +65,7 @@ namespace XeRxKEYs.Gestures.Triggers.Actions
                     TriggerAction profile = JsonConvert.DeserializeObject<TriggerAction>(jsonString);
                     if (profile != null && profile.Type == SerializableJSONDataType.TRIGGERACTION)
                     {
+                        profile.OriginalFileName = filePath;
                         profile.PrepareSendableInputs();
                         actionProfiles.Add(profile);
                     }

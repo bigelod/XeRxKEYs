@@ -116,6 +116,7 @@ namespace XeRxKEYs.Gestures.GestureProfiles
                     GestureProfile profile = JsonConvert.DeserializeObject<GestureProfile>(jsonString);
                     if (profile != null && profile.Type == SerializableJSONDataType.GESTUREPROFILE)
                     {
+                        profile.OriginalFileName = filePath;
                         profile.OnLoad(ref xrModuleInstance);
                         gestureProfiles.Add(profile);
                     }
