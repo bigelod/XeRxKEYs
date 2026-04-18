@@ -165,7 +165,6 @@
             this.cmbTriggerType = new System.Windows.Forms.ComboBox();
             this.pnlTriggerConditionsRightBottom = new System.Windows.Forms.Panel();
             this.btnCloseTriggerConditionEditor = new System.Windows.Forms.Button();
-            this.btnSaveTriggerCondition = new System.Windows.Forms.Button();
             this.pnlTriggerConditionsLeft = new System.Windows.Forms.Panel();
             this.lvwCurrentTriggerConditions = new System.Windows.Forms.ListView();
             this.pnlTriggerConditionsBottom = new System.Windows.Forms.Panel();
@@ -968,6 +967,7 @@
             this.pnlMotionGesturesRight.Name = "pnlMotionGesturesRight";
             this.pnlMotionGesturesRight.Size = new System.Drawing.Size(510, 409);
             this.pnlMotionGesturesRight.TabIndex = 2;
+            this.pnlMotionGesturesRight.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlMotionGesturesRight_Paint);
             // 
             // label28
             // 
@@ -987,6 +987,7 @@
             this.lstTriggerConditionPreview.ScrollAlwaysVisible = true;
             this.lstTriggerConditionPreview.Size = new System.Drawing.Size(226, 95);
             this.lstTriggerConditionPreview.TabIndex = 39;
+            this.lstTriggerConditionPreview.SelectedIndexChanged += new System.EventHandler(this.lstTriggerConditionPreview_SelectedIndexChanged);
             // 
             // btnEditTriggerConditions
             // 
@@ -1011,6 +1012,7 @@
             this.chkEditMotionProfileTriggerOnAny.TabIndex = 36;
             this.chkEditMotionProfileTriggerOnAny.Text = ":Trigger On Any Condition Met";
             this.chkEditMotionProfileTriggerOnAny.UseVisualStyleBackColor = true;
+            this.chkEditMotionProfileTriggerOnAny.CheckedChanged += new System.EventHandler(this.chkEditMotionProfileTriggerOnAny_CheckedChanged);
             // 
             // label27
             // 
@@ -1344,6 +1346,7 @@
             this.lvwAllTriggerActions.Size = new System.Drawing.Size(260, 329);
             this.lvwAllTriggerActions.TabIndex = 18;
             this.lvwAllTriggerActions.UseCompatibleStateImageBehavior = false;
+            this.lvwAllTriggerActions.View = System.Windows.Forms.View.List;
             this.lvwAllTriggerActions.SelectedIndexChanged += new System.EventHandler(this.lvwAllTriggerActions_SelectedIndexChanged);
             // 
             // pnlTriggerActionsBottom
@@ -1425,6 +1428,7 @@
             this.tcConditionTabs.Controls.Add(this.tabProxEvent);
             this.tcConditionTabs.Controls.Add(this.tabShakeEvent);
             this.tcConditionTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tcConditionTabs.Enabled = false;
             this.tcConditionTabs.Location = new System.Drawing.Point(0, 42);
             this.tcConditionTabs.Name = "tcConditionTabs";
             this.tcConditionTabs.SelectedIndex = 0;
@@ -1585,13 +1589,11 @@
             // 
             // clbObjectGroupB
             // 
-            this.clbObjectGroupB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.clbObjectGroupB.FormattingEnabled = true;
             this.clbObjectGroupB.Location = new System.Drawing.Point(286, 38);
             this.clbObjectGroupB.Name = "clbObjectGroupB";
             this.clbObjectGroupB.ScrollAlwaysVisible = true;
-            this.clbObjectGroupB.Size = new System.Drawing.Size(190, 79);
+            this.clbObjectGroupB.Size = new System.Drawing.Size(190, 94);
             this.clbObjectGroupB.TabIndex = 40;
             this.clbObjectGroupB.SelectedIndexChanged += new System.EventHandler(this.clbObjectGroupB_SelectedIndexChanged);
             // 
@@ -1607,13 +1609,11 @@
             // 
             // clbObjectGroupA
             // 
-            this.clbObjectGroupA.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.clbObjectGroupA.FormattingEnabled = true;
             this.clbObjectGroupA.Location = new System.Drawing.Point(28, 38);
             this.clbObjectGroupA.Name = "clbObjectGroupA";
             this.clbObjectGroupA.ScrollAlwaysVisible = true;
-            this.clbObjectGroupA.Size = new System.Drawing.Size(190, 79);
+            this.clbObjectGroupA.Size = new System.Drawing.Size(190, 94);
             this.clbObjectGroupA.TabIndex = 38;
             this.clbObjectGroupA.SelectedIndexChanged += new System.EventHandler(this.clbObjectGroupA_SelectedIndexChanged);
             // 
@@ -1652,13 +1652,11 @@
             // 
             // clbTriggerForObjects
             // 
-            this.clbTriggerForObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.clbTriggerForObjects.FormattingEnabled = true;
             this.clbTriggerForObjects.Location = new System.Drawing.Point(91, 41);
             this.clbTriggerForObjects.Name = "clbTriggerForObjects";
             this.clbTriggerForObjects.ScrollAlwaysVisible = true;
-            this.clbTriggerForObjects.Size = new System.Drawing.Size(190, 79);
+            this.clbTriggerForObjects.Size = new System.Drawing.Size(190, 169);
             this.clbTriggerForObjects.TabIndex = 36;
             this.clbTriggerForObjects.SelectedIndexChanged += new System.EventHandler(this.clbTriggerForObjects_SelectedIndexChanged);
             // 
@@ -1695,7 +1693,6 @@
             // pnlTriggerConditionsRightBottom
             // 
             this.pnlTriggerConditionsRightBottom.Controls.Add(this.btnCloseTriggerConditionEditor);
-            this.pnlTriggerConditionsRightBottom.Controls.Add(this.btnSaveTriggerCondition);
             this.pnlTriggerConditionsRightBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlTriggerConditionsRightBottom.Location = new System.Drawing.Point(0, 362);
             this.pnlTriggerConditionsRightBottom.Name = "pnlTriggerConditionsRightBottom";
@@ -1712,17 +1709,6 @@
             this.btnCloseTriggerConditionEditor.Text = "Close Trigger Condition Editor";
             this.btnCloseTriggerConditionEditor.UseVisualStyleBackColor = true;
             this.btnCloseTriggerConditionEditor.Click += new System.EventHandler(this.btnCloseTriggerConditionEditor_Click);
-            // 
-            // btnSaveTriggerCondition
-            // 
-            this.btnSaveTriggerCondition.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSaveTriggerCondition.Enabled = false;
-            this.btnSaveTriggerCondition.Location = new System.Drawing.Point(352, 6);
-            this.btnSaveTriggerCondition.Name = "btnSaveTriggerCondition";
-            this.btnSaveTriggerCondition.Size = new System.Drawing.Size(142, 32);
-            this.btnSaveTriggerCondition.TabIndex = 27;
-            this.btnSaveTriggerCondition.Text = "Save Changes";
-            this.btnSaveTriggerCondition.UseVisualStyleBackColor = true;
             // 
             // pnlTriggerConditionsLeft
             // 
@@ -1745,6 +1731,7 @@
             this.lvwCurrentTriggerConditions.Size = new System.Drawing.Size(260, 329);
             this.lvwCurrentTriggerConditions.TabIndex = 18;
             this.lvwCurrentTriggerConditions.UseCompatibleStateImageBehavior = false;
+            this.lvwCurrentTriggerConditions.View = System.Windows.Forms.View.List;
             this.lvwCurrentTriggerConditions.SelectedIndexChanged += new System.EventHandler(this.lvwCurrentTriggerConditions_SelectedIndexChanged);
             // 
             // pnlTriggerConditionsBottom
@@ -1994,7 +1981,6 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.CheckedListBox clbTriggerForObjects;
         private System.Windows.Forms.Panel pnlTriggerConditionsRightBottom;
-        private System.Windows.Forms.Button btnSaveTriggerCondition;
         private System.Windows.Forms.Button btnCloseTriggerConditionEditor;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.CheckedListBox clbObjectGroupB;
