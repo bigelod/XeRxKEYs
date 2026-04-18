@@ -72,6 +72,8 @@ namespace XeRxKEYs
         private bool _TriggerActionChanged = false;
         private bool _TriggerConditionChanged = false;
 
+        private bool listViewLock = false;
+
         private List<TriggerCondition> _motionGestureTriggerConditions = new List<TriggerCondition>();
         #endregion
 
@@ -782,7 +784,7 @@ namespace XeRxKEYs
             g.ProximityEvent.Device_Group_A.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Head")));
             g.ProximityEvent.Device_Group_B.Add(xrModuleInstance.GetTrackedObject(new SerializableTrackedObject("Right Hand")));
             //g.ProximityEvent.Invert = true;
-            g.ProximityEvent.Trigger_When = new ChangeAmount();
+            g.ProximityEvent.Trigger_When = new ChangeAmount(0, 10);
 
             //f.Disable_If_Trigger_Conditions.Add(g);
 
@@ -857,6 +859,8 @@ namespace XeRxKEYs
 
         private void SetTabPage(TabPage page, bool forceRefresh = false)
         {
+            listViewLock = false;
+
             if (tcDisplayTabs.SelectedTab != page)
             {
                 tcDisplayTabs.SelectedTab = page;
@@ -1450,90 +1454,96 @@ namespace XeRxKEYs
         }
         private void lvwAllGestureProfiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ConfirmProfileEditorSave();
-
-            if (_editingGestureProfile > -1)
+            if (!listViewLock)
             {
-                ClearGestureProfileEdit();
-            }
+                listViewLock = true;
 
-            _editingGestureProfile = -1;
+                ConfirmProfileEditorSave();
 
-            lvwProfileEnabledMotionGestures.SmallImageList = null;
-            lvwProfileEnabledMotionGestures.Items.Clear();
-
-            if (lvwAllGestureProfiles.Items.Count > 0 && lvwAllGestureProfiles.SelectedIndices.Count > 0 && lvwAllGestureProfiles.SelectedIndices[0] > -1)
-            {
-                txtEditGestureProfileName.Enabled = true;
-                txtEditGestureProfileDescription.Enabled = true;
-                btnDeleteGestureProfile.Enabled = true;
-
-                _editingGestureProfile = lvwAllGestureProfiles.SelectedIndices[0];
-
-                GestureProfile profile = allGestureProfiles[_editingGestureProfile];
-
-                txtEditGestureProfileName.Text = profile.Name;
-                txtEditGestureProfileDescription.Text = profile.Description;
-
-                if (profile.Image != "")
+                if (_editingGestureProfile > -1)
                 {
-                    _editingGestureProfileImage = profile.Image;
-
-                    if (!StopImageLoads)
-                    {
-                        string imagePath = Path.Combine(imageDirectory, profile.Image);
-
-                        picEditGestureProfileIcon.Image = Image.FromFile(imagePath);
-                    }
+                    ClearGestureProfileEdit();
+                    _editingGestureProfile = -1;
                 }
 
-                ImageList smallImageList = new ImageList();
-                smallImageList.ImageSize = new Size(32, 32);
-                smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+                lvwProfileEnabledMotionGestures.SmallImageList = null;
+                lvwProfileEnabledMotionGestures.Items.Clear();
 
-                lvwProfileEnabledMotionGestures.SmallImageList = smallImageList;
-                lvwProfileEnabledMotionGestures.View = View.SmallIcon;
-
-                foreach (MotionGesture gesture in allMotionGestures)
+                if (lvwAllGestureProfiles.Items.Count > 0 && lvwAllGestureProfiles.SelectedIndices.Count > 0 && lvwAllGestureProfiles.SelectedIndices[0] > -1)
                 {
-                    int imgIndex = -1;
+                    txtEditGestureProfileName.Enabled = true;
+                    txtEditGestureProfileDescription.Enabled = true;
+                    btnDeleteGestureProfile.Enabled = true;
 
-                    if (gesture.Image != "" && !StopImageLoads)
+                    _editingGestureProfile = lvwAllGestureProfiles.SelectedIndices[0];
+
+                    GestureProfile profile = allGestureProfiles[_editingGestureProfile];
+
+                    txtEditGestureProfileName.Text = profile.Name;
+                    txtEditGestureProfileDescription.Text = profile.Description;
+
+                    if (profile.Image != "")
                     {
-                        try
-                        {
-                            Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, gesture.Image));
-                            smallImageList.Images.Add(gestureIcon);
-                            imgIndex = smallImageList.Images.Count - 1;
-                        }
-                        catch
-                        {
+                        _editingGestureProfileImage = profile.Image;
 
+                        if (!StopImageLoads)
+                        {
+                            string imagePath = Path.Combine(imageDirectory, profile.Image);
+
+                            picEditGestureProfileIcon.Image = Image.FromFile(imagePath);
+                        }
+                    }
+
+                    ImageList smallImageList = new ImageList();
+                    smallImageList.ImageSize = new Size(32, 32);
+                    smallImageList.ColorDepth = ColorDepth.Depth32Bit;
+
+                    lvwProfileEnabledMotionGestures.SmallImageList = smallImageList;
+                    lvwProfileEnabledMotionGestures.View = View.SmallIcon;
+
+                    foreach (MotionGesture gesture in allMotionGestures)
+                    {
+                        int imgIndex = -1;
+
+                        if (gesture.Image != "" && !StopImageLoads)
+                        {
+                            try
+                            {
+                                Image gestureIcon = Image.FromFile(Path.Combine(imageDirectory, gesture.Image));
+                                smallImageList.Images.Add(gestureIcon);
+                                imgIndex = smallImageList.Images.Count - 1;
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+
+                        string itemName = MinLenStr(gesture.Name + ": " + gesture.Description, 110);
+
+                        if (gesture.Description == "")
+                        {
+                            itemName = MinLenStr(gesture.Name + ": [No Description]", 110);
+                        }
+
+                        lvwProfileEnabledMotionGestures.Items.Add(new ListViewItem(itemName, imgIndex));
+
+                        foreach (MotionGesture activeGesture in profile.Gestures)
+                        {
+                            if (activeGesture.Name == gesture.Name)
+                            {
+                                lvwProfileEnabledMotionGestures.Items[lvwProfileEnabledMotionGestures.Items.Count - 1].Checked = true;
+
+                                break;
+                            }
                         }
                     }
 
-                    string itemName = MinLenStr(gesture.Name + ": " + gesture.Description, 110);
-
-                    if (gesture.Description == "")
-                    {
-                        itemName = MinLenStr(gesture.Name + ": [No Description]", 110);
-                    }
-
-                    lvwProfileEnabledMotionGestures.Items.Add(new ListViewItem(itemName, imgIndex));
-
-                    foreach (MotionGesture activeGesture in profile.Gestures)
-                    {
-                        if (activeGesture.Name == gesture.Name)
-                        {
-                            lvwProfileEnabledMotionGestures.Items[lvwProfileEnabledMotionGestures.Items.Count - 1].Checked = true;
-
-                            break;
-                        }
-                    }
+                    _GestureProfileChanged = false;
+                    UpdateGestureProfileEditor();
                 }
 
-                _GestureProfileChanged = false;
-                UpdateGestureProfileEditor();
+                listViewLock = false;
             }
         }
 
@@ -1786,66 +1796,74 @@ namespace XeRxKEYs
 
         private void lvwAllMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ConfirmMotionGestureSave();
-
-            if (_editingMotionGesture > -1)
+            if (!listViewLock)
             {
-                ClearMotionGestureEdit();
-            }
+                listViewLock = true;
 
-            _editingMotionGesture = -1;
+                ConfirmMotionGestureSave();
 
-            if (lvwAllMotionGestures.Items.Count > 0 && lvwAllMotionGestures.SelectedIndices.Count > 0 && lvwAllMotionGestures.SelectedIndices[0] > -1)
-            {
-                txtEditMotionGestureName.Enabled = true;
-                txtEditMotionGestureDescription.Enabled = true;
-                btnDeleteMotionGesture.Enabled = true;
-
-                _editingMotionGesture = lvwAllMotionGestures.SelectedIndices[0];
-
-                MotionGesture motion = allMotionGestures[_editingMotionGesture];
-
-                txtEditMotionGestureName.Text = motion.Name;
-                txtEditMotionGestureDescription.Text = motion.Description;
-
-                if (motion.Image != "")
+                if (_editingMotionGesture > -1)
                 {
-                    _editingMotionGestureImage = motion.Image;
-
-                    if (!StopImageLoads)
-                    {
-                        string imagePath = Path.Combine(imageDirectory, motion.Image);
-
-                        picEditMotionGestureIcon.Image = Image.FromFile(imagePath);
-                    }
+                    ClearMotionGestureEdit();
+                    _editingMotionGesture = -1;
                 }
 
-                lstTriggerConditionPreview.Items.Clear();
-                _motionGestureTriggerConditions = new List<TriggerCondition>();
-
-                foreach (TriggerCondition cond in motion.TriggerConditions)
+                if (lvwAllMotionGestures.Items.Count > 0 && lvwAllMotionGestures.SelectedIndices.Count > 0 && lvwAllMotionGestures.SelectedIndices[0] > -1)
                 {
-                    _motionGestureTriggerConditions.Add(cond);
-                    lstTriggerConditionPreview.Items.Add(cond.Type.ToString().Replace("_", " "));
-                }
+                    txtEditMotionGestureName.Enabled = true;
+                    txtEditMotionGestureDescription.Enabled = true;
+                    btnDeleteMotionGesture.Enabled = true;
 
-                clbEnabledTriggerActions.Items.Clear();
+                    _editingMotionGesture = lvwAllMotionGestures.SelectedIndices[0];
 
-                foreach (TriggerAction action in allTriggerActions)
-                {
-                    clbEnabledTriggerActions.Items.Add(action.Name);
+                    MotionGesture motion = allMotionGestures[_editingMotionGesture];
 
-                    foreach (TriggerAction enabledAction in motion.TriggerActions)
+                    txtEditMotionGestureName.Text = motion.Name;
+                    txtEditMotionGestureDescription.Text = motion.Description;
+
+                    chkEditMotionProfileTriggerOnAny.Checked = motion.TriggerOnAnyCondition;
+
+                    if (motion.Image != "")
                     {
-                        if (enabledAction.Name == action.Name)
+                        _editingMotionGestureImage = motion.Image;
+
+                        if (!StopImageLoads)
                         {
-                            clbEnabledTriggerActions.SetItemChecked(clbEnabledTriggerActions.Items.Count - 1, true);
+                            string imagePath = Path.Combine(imageDirectory, motion.Image);
+
+                            picEditMotionGestureIcon.Image = Image.FromFile(imagePath);
                         }
                     }
+
+                    lstTriggerConditionPreview.Items.Clear();
+                    _motionGestureTriggerConditions = new List<TriggerCondition>();
+
+                    foreach (TriggerCondition cond in motion.TriggerConditions)
+                    {
+                        _motionGestureTriggerConditions.Add(cond);
+                        lstTriggerConditionPreview.Items.Add(cond.Type.ToString().Replace("_", " "));
+                    }
+
+                    clbEnabledTriggerActions.Items.Clear();
+
+                    foreach (TriggerAction action in allTriggerActions)
+                    {
+                        clbEnabledTriggerActions.Items.Add(action.Name);
+
+                        foreach (TriggerAction enabledAction in motion.TriggerActions)
+                        {
+                            if (enabledAction.Name == action.Name)
+                            {
+                                clbEnabledTriggerActions.SetItemChecked(clbEnabledTriggerActions.Items.Count - 1, true);
+                            }
+                        }
+                    }
+
+                    _MotionGestureChanged = false;
+                    UpdateMotionGestureEditor();
                 }
 
-                _MotionGestureChanged = false;
-                UpdateMotionGestureEditor();
+                listViewLock = false;
             }
         }
 
@@ -1895,6 +1913,8 @@ namespace XeRxKEYs
 
                     allMotionGestures[_editingMotionGesture].Description = txtEditMotionGestureDescription.Text;
                     allMotionGestures[_editingMotionGesture].Image = _editingMotionGestureImage;
+
+                    allMotionGestures[_editingMotionGesture].TriggerOnAnyCondition = chkEditMotionProfileTriggerOnAny.Checked;
 
                     List<TriggerAction> activeTriggerActions = new List<TriggerAction>();
 
@@ -2178,112 +2198,118 @@ namespace XeRxKEYs
 
         private void lvwCurrentTriggerConditions_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ConfirmTriggerConditionSave();
-
-            if (_editingTriggerCondition > -1)
+            if (!listViewLock)
             {
-                ClearTriggerConditionEdit();
-            }
+                listViewLock = true;
 
-            _editingTriggerCondition = -1;
+                ConfirmTriggerConditionSave();
 
-            clbObjectGroupA.Items.Clear();
-            clbObjectGroupA.Items.Add("Head");
-            clbObjectGroupA.Items.Add("Left Hand");
-            clbObjectGroupA.Items.Add("Right Hand");
-
-            clbObjectGroupB.Items.Clear();
-            clbObjectGroupB.Items.Add("Head");
-            clbObjectGroupB.Items.Add("Left Hand");
-            clbObjectGroupB.Items.Add("Right Hand");
-
-            clbTriggerForObjects.Items.Clear();
-            clbTriggerForObjects.Items.Add("Head");
-            clbTriggerForObjects.Items.Add("Left Hand");
-            clbTriggerForObjects.Items.Add("Right Hand");
-
-            if (lvwCurrentTriggerConditions.Items.Count > 0 && lvwCurrentTriggerConditions.SelectedIndices.Count > 0 && lvwCurrentTriggerConditions.SelectedIndices[0] > -1)
-            {
-                pnlTriggerConditionsRight.Enabled = true;
-                btnDeleteTriggerCondition.Enabled = true;
-
-                _editingTriggerCondition = lvwCurrentTriggerConditions.SelectedIndices[0];
-
-                TriggerCondition cond = _motionGestureTriggerConditions[_editingTriggerCondition];
-
-                cmbTriggerType.SelectedIndex = (int)cond.Type;
-                cmbTriggerType.Enabled = true;
-
-                if (cond.Type == TriggerConditionType.Proximity)
+                if (_editingTriggerCondition > -1)
                 {
-                    if (cond.ProximityEvent != null)
-                    {
-                        foreach (TrackedObject obj in cond.ProximityEvent.Device_Group_A)
-                        {
-                            if (obj.Name == "Head")
-                            {
-                                clbObjectGroupA.SetItemChecked(0, true);
-                            }
-                            else if (obj.Name == "Left Hand")
-                            {
-                                clbObjectGroupA.SetItemChecked(1, true);
-                            }
-                            else if (obj.Name == "Right Hand")
-                            {
-                                clbObjectGroupA.SetItemChecked(2, true);
-                            }
-                        }
-
-                        foreach (TrackedObject obj in cond.ProximityEvent.Device_Group_B)
-                        {
-                            if (obj.Name == "Head")
-                            {
-                                clbObjectGroupB.SetItemChecked(0, true);
-                            }
-                            else if (obj.Name == "Left Hand")
-                            {
-                                clbObjectGroupB.SetItemChecked(1, true);
-                            }
-                            else if (obj.Name == "Right Hand")
-                            {
-                                clbObjectGroupB.SetItemChecked(2, true);
-                            }
-                        }
-
-                        chkProxEventTriggerOnce.Checked = cond.ProximityEvent.TriggerOnce;
-                        chkInvertProxEventTrigger.Checked = cond.ProximityEvent.Invert;
-
-                        if (cond.ProximityEvent.Trigger_When != null)
-                        {
-                            txtMinDistProxEvent.Text = cond.ProximityEvent.Trigger_When.MinValue.ToString();
-                            txtMaxDistProxEvent.Text = cond.ProximityEvent.Trigger_When.MaxValue.ToString();
-                        }
-                    }
+                    ClearTriggerConditionEdit();
+                    _editingTriggerCondition = -1;
                 }
-                else
+
+                clbObjectGroupA.Items.Clear();
+                clbObjectGroupA.Items.Add("Head");
+                clbObjectGroupA.Items.Add("Left Hand");
+                clbObjectGroupA.Items.Add("Right Hand");
+
+                clbObjectGroupB.Items.Clear();
+                clbObjectGroupB.Items.Add("Head");
+                clbObjectGroupB.Items.Add("Left Hand");
+                clbObjectGroupB.Items.Add("Right Hand");
+
+                clbTriggerForObjects.Items.Clear();
+                clbTriggerForObjects.Items.Add("Head");
+                clbTriggerForObjects.Items.Add("Left Hand");
+                clbTriggerForObjects.Items.Add("Right Hand");
+
+                if (lvwCurrentTriggerConditions.Items.Count > 0 && lvwCurrentTriggerConditions.SelectedIndices.Count > 0 && lvwCurrentTriggerConditions.SelectedIndices[0] > -1)
                 {
-                    if (cond.ShakeEvent != null)
+                    pnlTriggerConditionsRight.Enabled = true;
+                    btnDeleteTriggerCondition.Enabled = true;
+
+                    _editingTriggerCondition = lvwCurrentTriggerConditions.SelectedIndices[0];
+
+                    TriggerCondition cond = _motionGestureTriggerConditions[_editingTriggerCondition];
+
+                    cmbTriggerType.SelectedIndex = (int)cond.Type;
+                    cmbTriggerType.Enabled = true;
+
+                    if (cond.Type == TriggerConditionType.Proximity)
                     {
-                        foreach (TrackedObject obj in cond.ShakeEvent.Trigger_For_Objects)
+                        if (cond.ProximityEvent != null)
                         {
-                            if (obj.Name == "Head")
+                            foreach (TrackedObject obj in cond.ProximityEvent.Device_Group_A)
                             {
-                                clbTriggerForObjects.SetItemChecked(0, true);
+                                if (obj.Name == "Head")
+                                {
+                                    clbObjectGroupA.SetItemChecked(0, true);
+                                }
+                                else if (obj.Name == "Left Hand")
+                                {
+                                    clbObjectGroupA.SetItemChecked(1, true);
+                                }
+                                else if (obj.Name == "Right Hand")
+                                {
+                                    clbObjectGroupA.SetItemChecked(2, true);
+                                }
                             }
-                            else if (obj.Name == "Left Hand")
+
+                            foreach (TrackedObject obj in cond.ProximityEvent.Device_Group_B)
                             {
-                                clbTriggerForObjects.SetItemChecked(1, true);
+                                if (obj.Name == "Head")
+                                {
+                                    clbObjectGroupB.SetItemChecked(0, true);
+                                }
+                                else if (obj.Name == "Left Hand")
+                                {
+                                    clbObjectGroupB.SetItemChecked(1, true);
+                                }
+                                else if (obj.Name == "Right Hand")
+                                {
+                                    clbObjectGroupB.SetItemChecked(2, true);
+                                }
                             }
-                            else if (obj.Name == "Right Hand")
+
+                            chkProxEventTriggerOnce.Checked = cond.ProximityEvent.TriggerOnce;
+                            chkInvertProxEventTrigger.Checked = cond.ProximityEvent.Invert;
+
+                            if (cond.ProximityEvent.Trigger_When != null)
                             {
-                                clbTriggerForObjects.SetItemChecked(2, true);
+                                txtMinDistProxEvent.Text = cond.ProximityEvent.Trigger_When.MinValue.ToString();
+                                txtMaxDistProxEvent.Text = cond.ProximityEvent.Trigger_When.MaxValue.ToString();
                             }
                         }
                     }
+                    else
+                    {
+                        if (cond.ShakeEvent != null)
+                        {
+                            foreach (TrackedObject obj in cond.ShakeEvent.Trigger_For_Objects)
+                            {
+                                if (obj.Name == "Head")
+                                {
+                                    clbTriggerForObjects.SetItemChecked(0, true);
+                                }
+                                else if (obj.Name == "Left Hand")
+                                {
+                                    clbTriggerForObjects.SetItemChecked(1, true);
+                                }
+                                else if (obj.Name == "Right Hand")
+                                {
+                                    clbTriggerForObjects.SetItemChecked(2, true);
+                                }
+                            }
+                        }
+                    }
+
+                    _TriggerConditionChanged = false;
+                    UpdateTriggerConditionEditor();
                 }
 
-                _TriggerConditionChanged = false;
-                UpdateTriggerConditionEditor();
+                listViewLock = false;
             }
         }
 
