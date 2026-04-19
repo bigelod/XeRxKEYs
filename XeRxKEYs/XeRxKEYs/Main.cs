@@ -1458,11 +1458,9 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                ConfirmProfileEditorSave();
-
                 if (_editingGestureProfile > -1)
                 {
-                    ClearGestureProfileEdit();
+                    ConfirmProfileEditorSave();
                     _editingGestureProfile = -1;
                 }
 
@@ -1541,6 +1539,11 @@ namespace XeRxKEYs
 
                     _GestureProfileChanged = false;
                     UpdateGestureProfileEditor();
+                }
+                else
+                {
+                    _editingGestureProfile = -1;
+                    ClearGestureProfileEdit();
                 }
 
                 listViewLock = false;
@@ -1800,11 +1803,9 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                ConfirmMotionGestureSave();
-
                 if (_editingMotionGesture > -1)
                 {
-                    ClearMotionGestureEdit();
+                    ConfirmMotionGestureSave();
                     _editingMotionGesture = -1;
                 }
 
@@ -1861,6 +1862,11 @@ namespace XeRxKEYs
 
                     _MotionGestureChanged = false;
                     UpdateMotionGestureEditor();
+                }
+                else
+                {
+                    _editingMotionGesture = -1;
+                    ClearMotionGestureEdit();
                 }
 
                 listViewLock = false;
@@ -2202,11 +2208,9 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                ConfirmTriggerConditionSave();
-
                 if (_editingTriggerCondition > -1)
                 {
-                    ClearTriggerConditionEdit();
+                    ConfirmTriggerConditionSave();
                     _editingTriggerCondition = -1;
                 }
 
@@ -2307,6 +2311,11 @@ namespace XeRxKEYs
 
                     _TriggerConditionChanged = false;
                     UpdateTriggerConditionEditor();
+                }
+                else
+                {
+                    ClearTriggerConditionEdit();
+                    _editingTriggerCondition = -1;
                 }
 
                 listViewLock = false;
