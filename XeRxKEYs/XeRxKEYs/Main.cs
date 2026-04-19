@@ -75,6 +75,7 @@ namespace XeRxKEYs
         private bool listViewLock = false;
 
         private List<TriggerCondition> _motionGestureTriggerConditions = new List<TriggerCondition>();
+        private List<SendableInputCombo> _triggerActionSendableCombos = new List<SendableInputCombo>();
         #endregion
 
         #region STARTUP
@@ -964,7 +965,7 @@ namespace XeRxKEYs
                 index += 1;
             }
 
-            if (currIndex > -1)
+            if (currIndex >= 0)
             {
                 cmbDefaultXRModule.SelectedIndex = currIndex;
             }
@@ -987,7 +988,7 @@ namespace XeRxKEYs
                 index += 1;
             }
 
-            if (currIndex > -1)
+            if (currIndex >= 0)
             {
                 cmbDefaultGestureProfile.SelectedIndex = currIndex;
             }
@@ -1458,7 +1459,7 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                if (_editingGestureProfile > -1)
+                if (_editingGestureProfile >= 0)
                 {
                     ConfirmProfileEditorSave();
                     _editingGestureProfile = -1;
@@ -1746,7 +1747,12 @@ namespace XeRxKEYs
 
         private void lvwProfileEnabledMotionGestures_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_editingGestureProfile >= 0)
+            {
+                _GestureProfileChanged = true;
+            }
 
+            UpdateGestureProfileEditor();
         }
 
         private void lvwProfileEnabledMotionGestures_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -1803,7 +1809,7 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                if (_editingMotionGesture > -1)
+                if (_editingMotionGesture >= 0)
                 {
                     ConfirmMotionGestureSave();
                     _editingMotionGesture = -1;
@@ -1981,6 +1987,8 @@ namespace XeRxKEYs
                         DeleteMotionGestureFile(allMotionGestures[index]);
 
                         allMotionGestures.RemoveAt(index);
+
+                        //TODO: Remove also from every gesture profile
                     }
 
                     RefreshMotionGesturesUI();
@@ -2096,6 +2104,13 @@ namespace XeRxKEYs
 
         }
 
+        private void clbEnabledTriggerActions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_editingMotionGesture >= 0) _MotionGestureChanged = true;
+
+            UpdateMotionGestureEditor();
+        }
+
         private void IngestTriggerConditions()
         {
             lstTriggerConditionPreview.Items.Clear();
@@ -2112,22 +2127,154 @@ namespace XeRxKEYs
         #region TRIGGER_ACTIONS_UI
         private void RefreshTriggerActionsUI()
         {
-            //TODO: Load values into the Trigger Actions UI
+            ClearTriggerActionEdit();
+
+            lvwAllTriggerActions.Items.Clear();
+
+            foreach (TriggerAction act in allTriggerActions)
+            {
+                lvwAllTriggerActions.Items.Add(new ListViewItem(MinLenStr(act.Name, 110)));
+            }
         }
 
         private void lvwAllTriggerActions_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!listViewLock)
+            {
+                listViewLock = true;
 
+                if (_editingTriggerAction >= 0)
+                {
+                    ConfirmTriggerActionSave();
+                    _editingTriggerAction = -1;
+                }
+
+                if (lvwAllTriggerActions.Items.Count > 0 && lvwAllTriggerActions.SelectedIndices.Count > 0 && lvwAllTriggerActions.SelectedIndices[0] > -1)
+                {
+                    txtEditTriggerActionName.Enabled = true;
+                    txtEditTriggerActionDescription.Enabled = true;
+
+                    btnAddNewInput.Enabled = true;
+                    btnDeleteTriggerAction.Enabled = true;
+
+                    _editingTriggerAction = lvwAllTriggerActions.SelectedIndices[0];
+
+                    TriggerAction act = allTriggerActions[_editingTriggerAction];
+
+                    txtEditTriggerActionName.Text = act.Name;
+                    txtEditTriggerActionDescription.Text = act.Description;
+
+                    lstEditTriggerActionSendInputs.Items.Clear();
+                    _triggerActionSendableCombos.Clear();
+
+                    foreach (SendableInputCombo combo in act.InputCombos)
+                    {
+                        _triggerActionSendableCombos.Add(combo);
+
+                        string item = "";
+
+                        foreach (SendableInput input in combo.ComboInputs)
+                        {
+                            if (item != "") item += ", ";
+
+                            item += input.Name;
+                        }
+
+                        lstEditTriggerActionSendInputs.Items.Add(item);
+                    }
+
+                    _TriggerActionChanged = false;
+                    UpdateTriggerActionEditor();
+                }
+                else
+                {
+                    ClearTriggerActionEdit();
+                    _editingTriggerAction = -1;
+                }
+
+                listViewLock = false;
+            }
+        }
+
+        private void ConfirmTriggerActionSave()
+        {
+            if (_editingTriggerAction >= 0 && _TriggerActionChanged)
+            {
+                DialogResult result = MessageBox.Show(this, "Changes have been made to current Trigger Action, save changes?", "Trigger Action Changed - Unsaved Changes Will Be Lost!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    SaveTriggerActionEditor();
+                }
+            }
+        }
+
+        private void SaveTriggerActionEditor()
+        {
+            if (_editingTriggerAction >= 0 && allTriggerActions.Count > _editingTriggerAction)
+            {
+                if (txtEditTriggerActionName.Text != "")
+                {
+                    if (allTriggerActions[_editingTriggerAction].Name != txtEditTriggerActionName.Text)
+                    {
+                        //Name change, delete old file
+                        DeleteTriggerActionFile(allTriggerActions[_editingTriggerAction]);
+                        allTriggerActions[_editingTriggerAction].Name = txtEditTriggerActionName.Text;
+                    }
+
+                    allTriggerActions[_editingTriggerAction].Description = txtEditTriggerActionDescription.Text;
+
+                    allTriggerActions[_editingTriggerAction].InputCombos = new List<SendableInputCombo>();
+
+                    foreach (SendableInputCombo combo in _triggerActionSendableCombos)
+                    {
+                        allTriggerActions[_editingTriggerAction].InputCombos.Add(combo);
+                    }
+
+                    DeDuplicateAssets();
+
+                    RefreshTriggerActionsUI();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Unable to save, Trigger Action must have a non-blank name! Please change it and try again", "Trigger Action Name Cannot Be Blank!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void btnCreateNewTriggerAction_Click(object sender, EventArgs e)
         {
+            ConfirmTriggerActionSave();
 
+            allTriggerActions.Add(new TriggerAction("NewAction-" + DateTime.Now.ToString("ddHHmmssffff")));
+
+            RefreshTriggerActionsUI();
         }
 
         private void btnDeleteTriggerAction_Click(object sender, EventArgs e)
         {
+            if (lvwAllTriggerActions.Items.Count > 0 && lvwAllTriggerActions.SelectedIndices.Count > 0)
+            {
+                DialogResult confirmDelete = MessageBox.Show(this, "Delete this Trigger Action? This cannot be undone!", "Confirm Trigger Action Delete?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
 
+                if (confirmDelete == DialogResult.OK)
+                {
+                    int index = lvwAllTriggerActions.SelectedIndices[0];
+
+                    if (index < lvwAllTriggerActions.Items.Count)
+                    {
+                        DeleteTriggerActionFile(allTriggerActions[index]);
+
+                        string triggerActionName = allTriggerActions[index].Name;
+
+                        allTriggerActions.RemoveAt(index);
+
+                        //TODO: Remove also from every motion gesture and gesture profile
+                    }
+
+                    RefreshTriggerActionsUI();
+                }
+            }
         }
 
         private void pnlTriggerActionsRight_Paint(object sender, PaintEventArgs e)
@@ -2142,47 +2289,125 @@ namespace XeRxKEYs
 
         private void btnSaveEditedTriggerAction_Click(object sender, EventArgs e)
         {
-
+            SaveTriggerActionEditor();
         }
 
         private void btnAddNewInput_Click(object sender, EventArgs e)
         {
+            SelectInput inputSel = new SelectInput();
+
+            inputSel.SendInputTo(AddSendableInputCombo);
+
+            inputSel.ShowDialog(this);
+
+            inputSel.Dispose();
+
             UpdateTriggerActionEditor();
+        }
+
+        public void AddSendableInputCombo(SendableInput input)
+        {
+            if (input != null)
+            {
+                SendableInputCombo combo = new SendableInputCombo();
+
+                combo.ComboInputs.Add(input);
+
+                if (_editingTriggerAction >= 0)
+                {
+                    lstEditTriggerActionSendInputs.Items.Add(input.Name);
+                    _triggerActionSendableCombos.Add(combo);
+
+                    _TriggerActionChanged = true;
+
+                    UpdateTriggerActionEditor();
+                }
+            }
         }
 
         private void btnDeleteInput_Click(object sender, EventArgs e)
         {
+            if (lstEditTriggerActionSendInputs.SelectedIndex > -1 && _triggerActionSendableCombos.Count > lstEditTriggerActionSendInputs.SelectedIndex)
+            {
+                _triggerActionSendableCombos.RemoveAt(lstEditTriggerActionSendInputs.SelectedIndex);
+                lstEditTriggerActionSendInputs.Items.RemoveAt(lstEditTriggerActionSendInputs.SelectedIndex);
+                _TriggerActionChanged = true;
+            }
+
             UpdateTriggerActionEditor();
         }
 
         private void lstEditTriggerActionSendInputs_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (lstEditTriggerActionSendInputs.Items.Count > 0)
+            {
+                btnDeleteInput.Enabled = true;
+            }
+
+            if (_editingTriggerAction >= 0) _TriggerActionChanged = true;
             UpdateTriggerActionEditor();
         }
 
         private void txtEditTriggerActionDescription_TextChanged(object sender, EventArgs e)
         {
+            if (_editingTriggerAction >= 0) _TriggerActionChanged = true;
             UpdateTriggerActionEditor();
         }
 
         private void txtEditTriggerActionName_TextChanged(object sender, EventArgs e)
         {
+            if (_editingTriggerAction >= 0 && txtEditTriggerActionName.Text != "") _TriggerActionChanged = true;
             UpdateTriggerActionEditor();
         }
 
         private void UpdateTriggerActionEditor()
         {
+            if (_TriggerActionChanged && _editingTriggerAction >= 0)
+            {
+                if (txtEditTriggerActionName.Text != "")
+                {
+                    btnSaveEditedTriggerAction.Enabled = true;
+                }
+                else
+                {
+                    btnSaveEditedTriggerAction.Enabled = false;
+                }
 
+                if (lstEditTriggerActionSendInputs.Items.Count <= 0)
+                {
+                    btnDeleteInput.Enabled = false;
+                }
+            }
+            else
+            {
+                _TriggerActionChanged = false;
+                btnSaveEditedTriggerAction.Enabled = false;
+            }
         }
 
         private void pnlTriggerActionsBottom_Paint(object sender, PaintEventArgs e)
         {
 
         }
+
+        private void ClearTriggerActionEdit()
+        {
+            _editingTriggerAction = -1;
+            _TriggerActionChanged = false;
+
+            btnDeleteTriggerAction.Enabled = false;
+
+            txtEditTriggerActionName.Enabled = false;
+            txtEditTriggerActionDescription.Enabled = false;
+
+            lstEditTriggerActionSendInputs.Items.Clear();
+
+            btnAddNewInput.Enabled = false;
+            btnDeleteInput.Enabled = false;
+        }
         #endregion
 
         #region TRIGGER_CONDITIONS_UI
-        //_motionGestureTriggerConditions
         private void RefreshTriggerConditionsUI()
         {
             ClearTriggerConditionEdit();
@@ -2208,7 +2433,7 @@ namespace XeRxKEYs
             {
                 listViewLock = true;
 
-                if (_editingTriggerCondition > -1)
+                if (_editingTriggerCondition >= 0)
                 {
                     ConfirmTriggerConditionSave();
                     _editingTriggerCondition = -1;
@@ -2479,7 +2704,7 @@ namespace XeRxKEYs
 
         private void cmbTriggerType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (_editingTriggerCondition > -1 && _motionGestureTriggerConditions.Count > _editingTriggerCondition)
+            if (_editingTriggerCondition >= 0 && _motionGestureTriggerConditions.Count > _editingTriggerCondition)
             {
                 tcConditionTabs.Visible = true;
 

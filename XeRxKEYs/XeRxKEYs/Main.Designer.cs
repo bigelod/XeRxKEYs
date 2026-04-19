@@ -1034,6 +1034,7 @@
             this.clbEnabledTriggerActions.ScrollAlwaysVisible = true;
             this.clbEnabledTriggerActions.Size = new System.Drawing.Size(231, 199);
             this.clbEnabledTriggerActions.TabIndex = 34;
+            this.clbEnabledTriggerActions.SelectedIndexChanged += new System.EventHandler(this.clbEnabledTriggerActions_SelectedIndexChanged);
             // 
             // label23
             // 
