@@ -26,7 +26,7 @@ namespace XeRxKEYs
     public partial class Main : Form
     {
         #region VARIABLES
-        private const int inputSendTime = 5000; //TODO: Send input more frequently than once every 5 seconds once testing is further along
+        private const int inputSendTimeMS = 200;
         private System.Threading.Timer _keySenderTimer;
 
         private const int cooldownTimeMS = 100;
@@ -94,7 +94,7 @@ namespace XeRxKEYs
 
             tcDisplayTabs.SelectedIndexChanged += tcDisplayTabs_SelectedIndexChanged;
 
-            _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTime, inputSendTime);
+            _keySenderTimer = new System.Threading.Timer(TimerCallback, null, inputSendTimeMS, inputSendTimeMS);
             _cooldownTimer = new System.Threading.Timer(CooldownCallback, null, cooldownTimeMS, cooldownTimeMS);
 
             imageDirectory = Path.Combine(Application.StartupPath, "Images");
@@ -185,8 +185,7 @@ namespace XeRxKEYs
 
             LoadAssets();
 
-            //TODO: Remove call to AssetTest
-            AssetTest();
+            //AssetTest();
 
             if (gestureProfile != "")
             {
@@ -1986,9 +1985,31 @@ namespace XeRxKEYs
                     {
                         DeleteMotionGestureFile(allMotionGestures[index]);
 
+                        string motionGestureName = allMotionGestures[index].Name;
+
                         allMotionGestures.RemoveAt(index);
 
-                        //TODO: Remove also from every gesture profile
+                        foreach (GestureProfile profile in allGestureProfiles)
+                        {
+                            int i = 0;
+                            bool foundGesture = false;
+
+                            foreach (MotionGesture gesture in profile.Gestures)
+                            {
+                                if (gesture.Name == motionGestureName)
+                                {
+                                    foundGesture = true;
+                                    break;
+                                }
+
+                                i += 1;
+                            }
+
+                            if (foundGesture)
+                            {
+                                profile.Gestures.RemoveAt(i);
+                            }
+                        }
                     }
 
                     RefreshMotionGesturesUI();
@@ -2269,7 +2290,52 @@ namespace XeRxKEYs
 
                         allTriggerActions.RemoveAt(index);
 
-                        //TODO: Remove also from every motion gesture and gesture profile
+                        foreach (MotionGesture gesture in allMotionGestures)
+                        {
+                            int i = 0;
+                            bool foundTriggerAction = false;
+
+                            foreach (TriggerAction act in gesture.TriggerActions)
+                            {
+                                if (act.Name == triggerActionName)
+                                {
+                                    foundTriggerAction = true;
+                                    break;
+                                }
+
+                                i += 1;
+                            }
+
+                            if (foundTriggerAction)
+                            {
+                                gesture.TriggerActions.RemoveAt(i);
+                            }
+                        }
+
+                        foreach (GestureProfile profile in allGestureProfiles)
+                        {
+                            foreach (MotionGesture gesture in profile.Gestures)
+                            {
+                                int i = 0;
+                                bool foundTriggerAction = false;
+
+                                foreach (TriggerAction act in gesture.TriggerActions)
+                                {
+                                    if (act.Name == triggerActionName)
+                                    {
+                                        foundTriggerAction = true;
+                                        break;
+                                    }
+
+                                    i += 1;
+                                }
+
+                                if (foundTriggerAction)
+                                {
+                                    gesture.TriggerActions.RemoveAt(i);
+                                }
+                            }
+                        }
                     }
 
                     RefreshTriggerActionsUI();
