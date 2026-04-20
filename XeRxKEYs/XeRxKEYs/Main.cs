@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +72,10 @@ namespace XeRxKEYs
         private bool _MotionGestureChanged = false;
         private bool _TriggerActionChanged = false;
         private bool _TriggerConditionChanged = false;
+
+        private string _initialGestureProfileName = "";
+        private string _initialMotionGestureName = "";
+        private string _initialTriggerActionName = "";
 
         private bool listViewLock = false;
 
@@ -1464,6 +1469,8 @@ namespace XeRxKEYs
                     _editingGestureProfile = -1;
                 }
 
+                _initialGestureProfileName = "";
+
                 lvwProfileEnabledMotionGestures.SmallImageList = null;
                 lvwProfileEnabledMotionGestures.Items.Clear();
 
@@ -1476,6 +1483,8 @@ namespace XeRxKEYs
                     _editingGestureProfile = lvwAllGestureProfiles.SelectedIndices[0];
 
                     GestureProfile profile = allGestureProfiles[_editingGestureProfile];
+
+                    _initialGestureProfileName = profile.Name;
 
                     txtEditGestureProfileName.Text = profile.Name;
                     txtEditGestureProfileDescription.Text = profile.Description;
@@ -1585,13 +1594,39 @@ namespace XeRxKEYs
         {
             if (_editingGestureProfile >= 0 && allGestureProfiles.Count > _editingGestureProfile)
             {
-                if (txtEditGestureProfileName.Text != "")
+                string newGestureProfileName = txtEditGestureProfileName.Text;
+
+                if (newGestureProfileName != "")
                 {
-                    if (allGestureProfiles[_editingGestureProfile].Name != txtEditGestureProfileName.Text)
+                    if (newGestureProfileName != _initialGestureProfileName)
+                    {
+                        bool conflictRecheck = true;
+
+                        while (conflictRecheck)
+                        {
+                            conflictRecheck = false;
+
+                            foreach (GestureProfile profile in allGestureProfiles)
+                            {
+                                if (profile.Name == newGestureProfileName)
+                                {
+                                    conflictRecheck = true;
+                                    break;
+                                }
+                            }
+
+                            if (conflictRecheck)
+                            {
+                                newGestureProfileName += " COPY";
+                            }
+                        }
+                    }
+
+                    if (allGestureProfiles[_editingGestureProfile].Name != newGestureProfileName)
                     {
                         //Name change, delete old file
                         DeleteGestureProfileFile(allGestureProfiles[_editingGestureProfile]);
-                        allGestureProfiles[_editingGestureProfile].Name = txtEditGestureProfileName.Text;
+                        allGestureProfiles[_editingGestureProfile].Name = newGestureProfileName;
                     }
 
                     allGestureProfiles[_editingGestureProfile].Description = txtEditGestureProfileDescription.Text;
@@ -1814,6 +1849,8 @@ namespace XeRxKEYs
                     _editingMotionGesture = -1;
                 }
 
+                _initialMotionGestureName = "";
+
                 if (lvwAllMotionGestures.Items.Count > 0 && lvwAllMotionGestures.SelectedIndices.Count > 0 && lvwAllMotionGestures.SelectedIndices[0] > -1)
                 {
                     txtEditMotionGestureName.Enabled = true;
@@ -1823,6 +1860,8 @@ namespace XeRxKEYs
                     _editingMotionGesture = lvwAllMotionGestures.SelectedIndices[0];
 
                     MotionGesture motion = allMotionGestures[_editingMotionGesture];
+
+                    _initialMotionGestureName = motion.Name;
 
                     txtEditMotionGestureName.Text = motion.Name;
                     txtEditMotionGestureDescription.Text = motion.Description;
@@ -1913,13 +1952,39 @@ namespace XeRxKEYs
         {
             if (_editingMotionGesture >= 0 && allMotionGestures.Count > _editingMotionGesture)
             {
-                if (txtEditMotionGestureName.Text != "")
+                string newMotionGestureName = txtEditMotionGestureName.Text;
+
+                if (newMotionGestureName != "")
                 {
-                    if (allMotionGestures[_editingMotionGesture].Name != txtEditMotionGestureName.Text)
+                    if (newMotionGestureName != _initialMotionGestureName)
+                    {
+                        bool conflictRecheck = true;
+
+                        while (conflictRecheck)
+                        {
+                            conflictRecheck = false;
+
+                            foreach (MotionGesture gesture in allMotionGestures)
+                            {
+                                if (gesture.Name == newMotionGestureName)
+                                {
+                                    conflictRecheck = true;
+                                    break;
+                                }
+                            }
+
+                            if (conflictRecheck)
+                            {
+                                newMotionGestureName += " COPY";
+                            }
+                        }
+                    }
+
+                    if (allMotionGestures[_editingMotionGesture].Name != newMotionGestureName)
                     {
                         //Name change, delete old file
                         DeleteMotionGestureFile(allMotionGestures[_editingMotionGesture]);
-                        allMotionGestures[_editingMotionGesture].Name = txtEditMotionGestureName.Text;
+                        allMotionGestures[_editingMotionGesture].Name = newMotionGestureName;
                     }
 
                     allMotionGestures[_editingMotionGesture].Description = txtEditMotionGestureDescription.Text;
@@ -2170,6 +2235,8 @@ namespace XeRxKEYs
                     _editingTriggerAction = -1;
                 }
 
+                _initialTriggerActionName = "";
+
                 if (lvwAllTriggerActions.Items.Count > 0 && lvwAllTriggerActions.SelectedIndices.Count > 0 && lvwAllTriggerActions.SelectedIndices[0] > -1)
                 {
                     txtEditTriggerActionName.Enabled = true;
@@ -2181,6 +2248,8 @@ namespace XeRxKEYs
                     _editingTriggerAction = lvwAllTriggerActions.SelectedIndices[0];
 
                     TriggerAction act = allTriggerActions[_editingTriggerAction];
+
+                    _initialTriggerActionName = act.Name;
 
                     txtEditTriggerActionName.Text = act.Name;
                     txtEditTriggerActionDescription.Text = act.Description;
@@ -2234,13 +2303,39 @@ namespace XeRxKEYs
         {
             if (_editingTriggerAction >= 0 && allTriggerActions.Count > _editingTriggerAction)
             {
-                if (txtEditTriggerActionName.Text != "")
+                string newTriggerActionName = txtEditTriggerActionName.Text;
+
+                if (newTriggerActionName != "")
                 {
-                    if (allTriggerActions[_editingTriggerAction].Name != txtEditTriggerActionName.Text)
+                    if (newTriggerActionName != _initialTriggerActionName)
+                    {
+                        bool conflictRecheck = true;
+
+                        while (conflictRecheck)
+                        {
+                            conflictRecheck = false;
+
+                            foreach (TriggerAction act in allTriggerActions)
+                            {
+                                if (act.Name == newTriggerActionName)
+                                {
+                                    conflictRecheck = true;
+                                    break;
+                                }
+                            }
+
+                            if (conflictRecheck)
+                            {
+                                newTriggerActionName += " COPY";
+                            }
+                        }
+                    }
+
+                    if (allTriggerActions[_editingTriggerAction].Name != newTriggerActionName)
                     {
                         //Name change, delete old file
                         DeleteTriggerActionFile(allTriggerActions[_editingTriggerAction]);
-                        allTriggerActions[_editingTriggerAction].Name = txtEditTriggerActionName.Text;
+                        allTriggerActions[_editingTriggerAction].Name = newTriggerActionName;
                     }
 
                     allTriggerActions[_editingTriggerAction].Description = txtEditTriggerActionDescription.Text;
@@ -2776,6 +2871,11 @@ namespace XeRxKEYs
 
                 if ((int)_motionGestureTriggerConditions[_editingTriggerCondition].Type != cmbTriggerType.SelectedIndex)
                 {
+                    if (_editingTriggerCondition < lvwCurrentTriggerConditions.Items.Count)
+                    {
+                        lvwCurrentTriggerConditions.Items[_editingTriggerCondition].Text = MinLenStr(((TriggerConditionType)cmbTriggerType.SelectedIndex).ToString().Replace("_", " "), 110);
+                    }
+
                     _motionGestureTriggerConditions[_editingTriggerCondition] = new TriggerCondition((TriggerConditionType)cmbTriggerType.SelectedIndex);
                     _TriggerConditionChanged = true;
                 }
